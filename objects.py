@@ -1,5 +1,6 @@
 import pygame
 from math import sin, cos, radians
+from random import randint, random, uniform
 
 #water
 #barricade
@@ -20,6 +21,9 @@ def rotate_point(point, angle, center_point=(0, 0)):
     return new_point
 
 class Boat():
+    WEATHER_HELM_FORCE = 0.02
+    BOAT_HEEL_FORCE = 2
+
     COLOR = 255, 255, 255
     RUDDER_COLOR = 200, 0, 0
     SHAPE = [[50, 0], [100, 150], [75, 200], [25, 200], [0, 150]]
@@ -30,13 +34,22 @@ class Boat():
     def __init__(self):
         self.rudder_angle = 0.
         self.boat_angle = 0.
+        self.boat_heel = 0.
         self.target_angle = 0.
         self.speed = 3.
         self.x = 150.
         self.y = 100.
 
-    def update(self):
+    def update(self, env):
+        # steering input
         self.boat_angle -= self.rudder_angle / 10
+
+        # weather helm
+        force = sin(radians(self.boat_angle - env.wind_direction + 180))
+        self.boat_angle += force * self.WEATHER_HELM_FORCE * env.wind_speed
+
+        # calculate boat heel
+        self.boat_heel = abs(force) * env.wind_speed * self.BOAT_HEEL_FORCE
 
         # maximize rudder angle
         self.rudder_angle = 50 if self.rudder_angle > 50 else self.rudder_angle
@@ -72,7 +85,47 @@ class Boat():
 
 
 class Environment():
+    
+    WIND_SPEED_VAR = 1.2
+    WIND_DIRECTION_VAR = 1.2
+
+    ARROW_SHAPE = [(0, 100), (0, 200), (200, 200), (200, 300), (300, 150), (200, 0), (200, 100)]
+    ARROW_COLOR = (0, 255, 0)
+    ARROW_POS = [350, 250]
+    ARROW_ORIGIN = [0, 100]
+    ARROW_SCALE = 0.2
+
     def __init__(self):
-        self.wind_speed = 15
-        self.wind_direction = 90
-        self.boat_angle = 0
+        self.main_wind_speed = uniform(5, 25)
+        self.main_wind_direction = uniform(0, 360)
+        self.wind_speed = self.main_wind_speed
+        self.wind_direction = self.main_wind_direction
+
+    def update(self):
+        
+        self.wind_speed += (random() - 0.5) * 2
+        max_wind_speed = self.main_wind_speed * self.WIND_SPEED_VAR
+        min_wind_speed = self.main_wind_speed / self.WIND_SPEED_VAR
+        self.wind_speed = self.wind_speed if self.wind_speed < max_wind_speed else max_wind_speed
+        self.wind_speed = self.wind_speed if self.wind_speed > min_wind_speed else min_wind_speed
+        
+        self.wind_direction += (random() - 0.5) * 2
+        max_wind_dir = self.main_wind_direction * self.WIND_SPEED_VAR
+        min_wind_dir = self.main_wind_direction / self.WIND_SPEED_VAR
+        self.wind_direction = self.wind_direction if self.wind_direction < max_wind_dir else max_wind_dir
+        self.wind_direction = self.wind_direction if self.wind_direction > min_wind_dir else min_wind_dir
+        
+        # wrap wind dir
+        self.wind_direction =  self.wind_direction + 360 if self.wind_direction<0 else self.wind_direction
+        self.wind_direction =  self.wind_direction - 360 if self.wind_direction>360 else self.wind_direction
+
+    def draw(self, screen):
+        vectors = self.ARROW_SHAPE.copy()
+        for i, vector in enumerate(vectors):
+            vector = rotate_point(vector, self.wind_direction + 90, self.ARROW_ORIGIN)
+            vector = [self.ARROW_POS[0] + vector[0], self.ARROW_POS[1] + vector[1]]
+            vector = [vector[0] * self.ARROW_SCALE, vector[1] * self.ARROW_SCALE]
+            vectors[i] = vector
+
+        #surface = pygame.transform.rotate(screen, self.wind_direction)
+        pygame.draw.polygon(screen, self.ARROW_COLOR, vectors)
