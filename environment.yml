@@ -1,0 +1,14 @@
+name: aicaptain
+channels:
+  - cogsci
+  - defaults
+dependencies:
+  - python=3.6
+  - pandas
+  - ipykernel
+  - matplotlib
+  - scikit-learn
+  - scikit-image
+  - tensorflow
+  - keras
+#  - pygame
