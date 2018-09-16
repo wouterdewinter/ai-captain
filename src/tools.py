@@ -1,6 +1,6 @@
 from math import sin, cos, radians
 
-def rotate_point(point, angle, center_point=(0, 0)):
+def rotate_point(point, angle, center_point=(0, 0), reverse=False):
     """Rotates a point around center_point(origin by default)
     Angle is in degrees.
     Rotation is counter-clockwise
@@ -11,5 +11,15 @@ def rotate_point(point, angle, center_point=(0, 0)):
     new_point = (new_point[0] * cos(angle_rad) - new_point[1] * sin(angle_rad),
                  new_point[0] * sin(angle_rad) + new_point[1] * cos(angle_rad))
     # Reverse the shifting we have done
-    new_point = (new_point[0] + center_point[0], new_point[1] + center_point[1])
+    if reverse:
+        new_point = (new_point[0] + center_point[0], new_point[1] + center_point[1])
     return new_point
+
+def rotate_vectors(vectors, angle, center_point=(0, 0), reverse=False):
+    for i, vector in enumerate(vectors):
+        vectors[i] = rotate_point(vector, angle, center_point, reverse=reverse)
+    return vectors
+
+
+def add_vector(a, b):
+    return [a[0] + b[0], a[1] + b[1]]

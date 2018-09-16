@@ -1,11 +1,12 @@
 import pygame
 from math import sin, cos, radians
 from random import random, uniform
-from tools import rotate_point
+from tools import rotate_point, add_vector, rotate_vectors
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
-    BOAT_HEEL_FORCE = 2
+    BOAT_HEEL_FORCE = 1
+    RUDDER_SPEED = 1
 
     COLOR = 255, 255, 255
     RUDDER_COLOR = 200, 0, 0
@@ -16,12 +17,13 @@ class Boat():
 
     def __init__(self, env):
         self.rudder_angle = 0.
+        self.target_rudder_angle = 0.
         self.boat_angle = 0.
         self.boat_heel = 0.
         self.target_angle = uniform(0, 360)
         self.speed = 3.
-        self.x = 150.
-        self.y = 100.
+        self.x = 250.
+        self.y = 250.
         self._env = env
 
     def get_course_error(self):
@@ -30,7 +32,10 @@ class Boat():
         return err
 
     def steer(self, rudder_movement):
-        self.rudder_angle += rudder_movement
+        self.target_rudder_angle += rudder_movement
+
+    def set_target_rudder_angle(self, target_rudder_angle):
+        self.target_rudder_angle = target_rudder_angle
 
     def update(self):
         # steering input
@@ -44,12 +49,28 @@ class Boat():
         self.boat_heel = abs(force) * self._env.wind_speed * self.BOAT_HEEL_FORCE
 
         # maximize rudder angle
-        self.rudder_angle = 50 if self.rudder_angle > 50 else self.rudder_angle
-        self.rudder_angle = -50 if self.rudder_angle < -50 else self.rudder_angle
+        self.target_rudder_angle = 50 if self.target_rudder_angle > 50 else self.target_rudder_angle
+        self.target_rudder_angle = -50 if self.target_rudder_angle < -50 else self.target_rudder_angle
+
+        # move rudder
+        if abs(self.target_rudder_angle - self.rudder_angle) < self.RUDDER_SPEED:
+            self.rudder_angle = self.target_rudder_angle
+        else:
+            if self.target_rudder_angle > self.rudder_angle:
+                self.rudder_angle += self.RUDDER_SPEED
+            else:
+                self.rudder_angle -= self.RUDDER_SPEED
 
         # wrap boat angle
         self.boat_angle =  self.boat_angle + 360 if self.boat_angle<0 else self.boat_angle
         self.boat_angle =  self.boat_angle - 360 if self.boat_angle>360 else self.boat_angle
+
+        # change target angle
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_1]:
+            self.target_angle -= 3
+        if pressed[pygame.K_2]:
+            self.target_angle += 3
 
     def draw(self, screen):
         # draw boat
@@ -66,6 +87,7 @@ class Boat():
 
             # rudder rotation
             vector = rotate_point(vector, self.rudder_angle, self.RUDDER_ORIGIN)
+            vector = add_vector(vector, self.RUDDER_ORIGIN)
 
             # boat rotation
             vector = rotate_point(vector, self.boat_angle, self.ORIGIN)
@@ -74,3 +96,8 @@ class Boat():
             vectors[i] = [self.x + vector[0], self.y + vector[1]]
 
         pygame.draw.line(screen, self.RUDDER_COLOR, vectors[0], vectors[1], 4)
+
+        # draw target direction
+        vectors = [[250, 30], [250, 50]]
+        vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
+        pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
