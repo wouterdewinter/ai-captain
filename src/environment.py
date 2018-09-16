@@ -17,6 +17,13 @@ class Environment():
     CENTER = (250, 250)
 
     def __init__(self):
+        self.main_wind_speed = 0
+        self.main_wind_direction = 0
+        self.wind_speed = 0
+        self.wind_direction = 0
+        self.shuffle()
+
+    def shuffle(self):
         self.main_wind_speed = uniform(5, 25)
         self.main_wind_direction = uniform(0, 360)
         self.wind_speed = self.main_wind_speed

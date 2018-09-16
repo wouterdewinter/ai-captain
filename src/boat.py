@@ -21,11 +21,17 @@ class Boat():
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
         self.boat_heel = 0.
-        self.target_angle = uniform(0, 360)
+        self.target_angle = 0
         self.speed = 3.
         self.x = 250.
         self.y = 250.
         self._env = env
+        self.history = []
+
+        self.shuffle()
+
+    def shuffle(self):
+        self.set_target_angle(uniform(0, 360))
 
     def get_course_error(self):
         err = self.boat_angle - self.target_angle
@@ -86,6 +92,18 @@ class Boat():
 
         # simulate or fetch boat movements
         self.move()
+
+        # save history
+        self.history.append({
+            'boat_angle': self.boat_angle,
+            'boat_heel': self.boat_heel,
+            'boat_speed': self.speed,
+            'target_angle': self.target_angle,
+            'course_error': self.get_course_error(),
+            'rudder_angle': self.rudder_angle,
+            'wind_direction': self._env.wind_direction,
+            'wind_speed': self._env.wind_speed,
+        })
 
         # change target angle
         pressed = pygame.key.get_pressed()

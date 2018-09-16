@@ -1,11 +1,15 @@
 import os, sys, pygame
 from time import sleep
+import pandas as pd
+import datetime
+import time
 
 class Simulator():
     SIZE = 800, 600
     SLEEP_TIME = 0.01
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
+    SHUFFLE_INTERVAL = 5
 
     def __init__(self, boat, env, strategy):
         self._boat = boat
@@ -25,7 +29,10 @@ class Simulator():
         self._screen.blit(textsurface, pos)
 
     def run(self):
-        while 1:
+        stop = False
+        shuffle_time = time.time() + self.SHUFFLE_INTERVAL
+
+        while not stop:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
 
@@ -49,8 +56,25 @@ class Simulator():
             self.write_text("Wind speed: %.1f knots" % self._env.wind_speed, 8)
 
             textsurface = self._smallfont.render(
-                "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed", True, self.TEXT_COLOR)
+                "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, q to quit", True, self.TEXT_COLOR)
             self._screen.blit(textsurface, (20, 550))
 
             pygame.display.flip()
+
+            # sleep
             sleep(self.SLEEP_TIME)
+
+            # shuffle once in a while
+            if time.time() > shuffle_time:
+                self._env.shuffle()
+                self._boat.shuffle()
+                shuffle_time += self.SHUFFLE_INTERVAL
+
+
+            pressed = pygame.key.get_pressed()
+            if pressed[pygame.K_q]:
+                stop=True
+
+        df = pd.DataFrame(self._boat.history)
+        date = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M')
+        df.to_csv(os.path.join('data', 'history_%s.csv' % date))
