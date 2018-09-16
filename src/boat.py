@@ -33,10 +33,19 @@ class Boat():
         return err
 
     def steer(self, rudder_movement):
-        self.target_rudder_angle += rudder_movement
+        self.set_target_rudder_angle(self.target_rudder_angle + rudder_movement)
 
     def set_target_rudder_angle(self, target_rudder_angle):
         self.target_rudder_angle = target_rudder_angle
+
+        # maximize rudder angle
+        self.target_rudder_angle = min(50, self.target_rudder_angle)
+        self.target_rudder_angle = max(-50, self.target_rudder_angle)
+
+    def set_target_angle(self, target_angle):
+        target_angle = target_angle + 360 if target_angle<0 else target_angle
+        target_angle = target_angle - 360 if target_angle>360 else target_angle
+        self.target_angle = target_angle
 
     def calculate_speed(self):
         delta = self._env.wind_direction - self.boat_angle
@@ -44,11 +53,13 @@ class Boat():
         speed = sin(radians(delta / 1.2)) *  self._env.wind_speed / 4
         return speed
 
-    def update(self):
+    def move(self):
+        """Simulates or fetches movement of boat"""
+
         # steering input
         self.boat_angle -= self.rudder_angle / 10
 
-        # weather helm
+        # apply weather helm
         force = sin(radians(self.boat_angle - self._env.wind_direction + 180))
         self.boat_angle += force * self.WEATHER_HELM_FORCE * self._env.wind_speed
 
@@ -57,10 +68,6 @@ class Boat():
 
         # calculate speed
         self.speed = self.calculate_speed()
-
-        # maximize rudder angle
-        self.target_rudder_angle = 50 if self.target_rudder_angle > 50 else self.target_rudder_angle
-        self.target_rudder_angle = -50 if self.target_rudder_angle < -50 else self.target_rudder_angle
 
         # move rudder
         if abs(self.target_rudder_angle - self.rudder_angle) < self.RUDDER_SPEED:
@@ -72,15 +79,20 @@ class Boat():
                 self.rudder_angle -= self.RUDDER_SPEED
 
         # wrap boat angle
-        self.boat_angle =  self.boat_angle + 360 if self.boat_angle<0 else self.boat_angle
-        self.boat_angle =  self.boat_angle - 360 if self.boat_angle>360 else self.boat_angle
+        self.boat_angle = self.boat_angle + 360 if self.boat_angle<0 else self.boat_angle
+        self.boat_angle = self.boat_angle - 360 if self.boat_angle>360 else self.boat_angle
+
+    def update(self):
+
+        # simulate or fetch boat movements
+        self.move()
 
         # change target angle
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_1]:
-            self.target_angle -= 3
+            self.set_target_angle(self.target_angle - 3)
         if pressed[pygame.K_2]:
-            self.target_angle += 3
+            self.set_target_angle(self.target_angle + 3)
 
     def draw(self, screen):
         # draw boat
@@ -112,11 +124,20 @@ class Boat():
         vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
         pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
 
-class DeepBlue():
-    def __init__(self, env):
-        super(env)
-        self._pilot = PilotControl(ip_address='127.0.0.1')
+class RealBoat(Boat):
+    def __init__(self, env, ip_address='127.0.0.1'):
+        super().__init__(env)
+        self._pilot = PilotControl(ip_address=ip_address)
 
-    def update(self):
-        pass
+    def set_target_rudder_angle(self, target_rudder_angle):
+        super().set_target_rudder_angle(target_rudder_angle)
+        self._pilot.set_rudder_angle(self.target_rudder_angle)
+
+    def set_target_angle(self, target_angle):
+        super().set_target_angle(target_angle)
+        self._pilot.set_course(self.target_angle)
+
+    def move(self):
+        data = self._pilot.get_data_from_pilot()
+        # todo: update speed, rudder angle, heel, course
 
