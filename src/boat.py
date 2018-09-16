@@ -2,7 +2,7 @@ import pygame
 from math import sin, cos, radians
 from random import random, uniform
 from tools import rotate_point, add_vector, rotate_vectors
-from autopilot.auto_pilot import PilotControl
+from autopilot.ai_captain_utils import PilotControl
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
@@ -38,6 +38,12 @@ class Boat():
     def set_target_rudder_angle(self, target_rudder_angle):
         self.target_rudder_angle = target_rudder_angle
 
+    def calculate_speed(self):
+        delta = self._env.wind_direction - self.boat_angle
+        delta = abs((delta + 180) % 360 - 180)
+        speed = sin(radians(delta / 1.2)) *  self._env.wind_speed / 4
+        return speed
+
     def update(self):
         # steering input
         self.boat_angle -= self.rudder_angle / 10
@@ -48,6 +54,9 @@ class Boat():
 
         # calculate boat heel
         self.boat_heel = abs(force) * self._env.wind_speed * self.BOAT_HEEL_FORCE
+
+        # calculate speed
+        self.speed = self.calculate_speed()
 
         # maximize rudder angle
         self.target_rudder_angle = 50 if self.target_rudder_angle > 50 else self.target_rudder_angle
