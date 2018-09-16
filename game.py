@@ -1,10 +1,17 @@
-import sys, pygame, objects, random, math
+import os, sys, pygame, random, math
+
+# update import path
+sys.path.insert(1, os.path.join(sys.path[0], 'src'))
+
+# import project code
+from boat import Boat
+from environment import Environment
+from strategies import *
 
 pygame.init()
 pygame.font.init()
 
 myfont = pygame.font.SysFont('Arial', 30)
-
 
 size = width, height = 800, 600
 speed = [2, 2]
@@ -14,11 +21,9 @@ text_color = 255, 255, 255
 
 screen = pygame.display.set_mode(size)
 
-ball = pygame.image.load("intro_ball.gif")
-ballrect = ball.get_rect()
-
-boat = objects.Boat()
-env = objects.Environment()
+env = Environment()
+boat = Boat(env)
+strategy = Manual(boat, env)
 
 def write_text(screen, text, row):
     pos = 500, 30 + (row * 30)
@@ -29,34 +34,23 @@ while 1:
     for event in pygame.event.get():
         if event.type == pygame.QUIT: sys.exit()
 
-    ballrect = ballrect.move(speed)
-    if ballrect.left < 0 or ballrect.right > width:
-        speed[0] = -speed[0]
-    if ballrect.top < 0 or ballrect.bottom > height:
-        speed[1] = -speed[1]
-
     screen.fill(blue)
-    #screen.blit(ball, ballrect)
-    #boat.boat_angle += 1
 
     env.update()
-    boat.update(env)
-
-    #boat.rudder_angle += (random.random() - 0.5) * 5
+    boat.update()
+    strategy.update()
 
     boat.draw(screen)
     env.draw(screen)
 
-    write_text(screen, "Boat angle: %.2f" % boat.boat_angle, 0)
-    write_text(screen, "Target angle: %.2f" % boat.target_angle, 1)
-    write_text(screen, "Current deviation: %.2f" % abs(boat.boat_angle - boat.target_angle), 2)
-    write_text(screen, "Boat heel: %.2f" % boat.boat_heel, 3)
-    write_text(screen, "Boat speed: %.2f" % boat.speed, 4)
-    write_text(screen, "Rudder angle: %.2f" % boat.rudder_angle, 5)
+    write_text(screen, "Boat angle: %.1f" % boat.boat_angle, 0)
+    write_text(screen, "Target angle: %.1f" % boat.target_angle, 1)
+    write_text(screen, "Current deviation: %.1f" % boat.get_course_error(), 2)
+    write_text(screen, "Boat heel: %.1f" % boat.boat_heel, 3)
+    write_text(screen, "Boat speed: %.1f" % boat.speed, 4)
+    write_text(screen, "Rudder angle: %.1f" % boat.rudder_angle, 5)
 
-    write_text(screen, "Wind speed: %.2f" % env.wind_speed, 6)
-    write_text(screen, "Wind direction: %.2f" % env.wind_direction, 7)
-
-    #pygame.draw.polygon(screen, black, [[50, 0], [100, 150], [75, 200], [25, 200], [0, 150]], 5)
+    write_text(screen, "Wind speed: %.1f" % env.wind_speed, 6)
+    write_text(screen, "Wind direction: %.1f" % env.wind_direction, 7)
 
     pygame.display.flip()
