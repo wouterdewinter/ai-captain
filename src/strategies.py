@@ -12,7 +12,7 @@ class Base():
         raise NotImplementedError()
 
 class Manual(Base):
-    STEERING_FORCE = .3
+    STEERING_FORCE = 1
 
     def update(self):
         pressed = pygame.key.get_pressed()
@@ -42,10 +42,10 @@ class Smoother(Base):
             self._boat.steer(-self.STEERING_FORCE)
 
 class Proportional(Base):
-    MAX_RUDDER = 20
+    MAX_RUDDER = 30
 
     def update(self):
-        err = self._boat.get_course_error()
+        err = self._boat.get_course_error() / 2
         err = max(min(err, self.MAX_RUDDER), -self.MAX_RUDDER)
         self._boat.set_target_rudder_angle(err)
 
@@ -57,6 +57,7 @@ class GB(Base):
 
     def update(self):
         data = [{
+            'angle_of_attack': self._boat.get_angle_of_attack(),
             'boat_heel': self._boat.boat_heel,
             'boat_speed': self._boat.speed,
             'course_error': self._boat.get_course_error(),

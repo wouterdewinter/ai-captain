@@ -9,7 +9,7 @@ class Simulator():
     SLEEP_TIME = 0.01
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
-    SHUFFLE_INTERVAL = 5
+    SHUFFLE_INTERVAL = 10
 
     def __init__(self, boat, env, strategy):
         self._boat = boat
@@ -52,8 +52,9 @@ class Simulator():
             self.write_text("Rudder angle: %.1f°" % self._boat.rudder_angle, 4)
             self.write_text("Boat speed: %.1f knots" % self._boat.speed, 5)
 
-            self.write_text("Wind direction: %.1f°" % self._env.wind_direction, 7)
-            self.write_text("Wind speed: %.1f knots" % self._env.wind_speed, 8)
+            self.write_text("Angle of attack: %.1f°" % self._boat.get_angle_of_attack(), 6)
+            self.write_text("Wind direction: %.1f°" % self._env.wind_direction, 8)
+            self.write_text("Wind speed: %.1f knots" % self._env.wind_speed, 9)
 
             textsurface = self._smallfont.render(
                 "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, q to quit", True, self.TEXT_COLOR)
@@ -77,4 +78,6 @@ class Simulator():
 
         df = pd.DataFrame(self._boat.history)
         date = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M')
-        df.to_csv(os.path.join('data', 'history_%s.csv' % date))
+        filename = os.path.join('data', 'history_%s.csv' % date)
+        df.to_csv(filename)
+        print("Wrote datalog to %s" % filename)

@@ -13,6 +13,7 @@ env = Environment()
 boat = Boat(env)
 #boat = RealBoat(ip_address='192.168.1.12')
 #strategy = Manual(boat, env)
+#strategy = Proportional(boat, env)
 strategy = GB(boat, env)
 
 sim = Simulator(boat, env, strategy)

@@ -3,6 +3,7 @@ from math import sin, cos, radians
 from random import random, uniform
 from tools import rotate_point, add_vector, rotate_vectors
 from autopilot.ai_captain_utils import PilotControl
+from datetime import datetime as dt
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
@@ -38,6 +39,11 @@ class Boat():
         err = (err + 180) % 360 - 180
         return err
 
+    def get_angle_of_attack(self):
+        value = self._env.wind_direction - self.boat_angle
+        value = (value + 180) % 360 - 180
+        return value
+
     def steer(self, rudder_movement):
         self.set_target_rudder_angle(self.target_rudder_angle + rudder_movement)
 
@@ -57,13 +63,16 @@ class Boat():
         delta = self._env.wind_direction - self.boat_angle
         delta = abs((delta + 180) % 360 - 180)
         speed = sin(radians(delta / 1.2)) *  self._env.wind_speed / 4
+        # add bonus speed, don't want the boat to stop
+        # todo: implement some momentum algorithm
+        speed += 1
         return speed
 
     def move(self):
         """Simulates or fetches movement of boat"""
 
-        # steering input
-        self.boat_angle -= self.rudder_angle / 10
+        # steering input (speed dependant)
+        self.boat_angle -= self.rudder_angle / 10 * self.speed / 5
 
         # apply weather helm
         force = sin(radians(self.boat_angle - self._env.wind_direction + 180))
@@ -95,6 +104,7 @@ class Boat():
 
         # save history
         self.history.append({
+            'datetime': dt.now(),
             'boat_angle': self.boat_angle,
             'boat_heel': self.boat_heel,
             'boat_speed': self.speed,
@@ -103,6 +113,7 @@ class Boat():
             'rudder_angle': self.rudder_angle,
             'wind_direction': self._env.wind_direction,
             'wind_speed': self._env.wind_speed,
+            'angle_of_attack': self.get_angle_of_attack()
         })
 
         # change target angle
