@@ -2,6 +2,7 @@ import pygame
 from math import sin, cos, radians
 from random import random, uniform
 from tools import rotate_point, add_vector, rotate_vectors
+from autopilot.auto_pilot import PilotControl
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
@@ -101,3 +102,12 @@ class Boat():
         vectors = [[250, 30], [250, 50]]
         vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
         pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
+
+class DeepBlue():
+    def __init__(self, env):
+        super(env)
+        self._pilot = PilotControl(ip_address='127.0.0.1')
+
+    def update(self):
+        pass
+
