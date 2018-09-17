@@ -3,6 +3,7 @@ from time import sleep
 import pandas as pd
 import datetime
 import time
+from sklearn.metrics import mean_absolute_error
 
 class Simulator():
     SIZE = 800, 600
@@ -45,6 +46,8 @@ class Simulator():
             self._boat.draw(self._screen)
             self._env.draw(self._screen)
 
+            mae = mean_absolute_error(self._boat.history.target_angle, self._boat.history.boat_angle)
+
             self.write_text("Boat angle: %.1f°" % self._boat.boat_angle, 0)
             self.write_text("Target angle: %.1f°" % self._boat.target_angle, 1)
             self.write_text("Current deviation: %.1f°" % self._boat.get_course_error(), 2)
@@ -55,6 +58,7 @@ class Simulator():
             self.write_text("Angle of attack: %.1f°" % self._boat.get_angle_of_attack(), 6)
             self.write_text("Wind direction: %.1f°" % self._env.wind_direction, 8)
             self.write_text("Wind speed: %.1f knots" % self._env.wind_speed, 9)
+            self.write_text("MAE: %.1f°" % mae, 11)
 
             textsurface = self._smallfont.render(
                 "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, q to quit", True, self.TEXT_COLOR)
@@ -76,8 +80,7 @@ class Simulator():
             if pressed[pygame.K_q]:
                 stop=True
 
-        df = pd.DataFrame(self._boat.history)
         date = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M')
         filename = os.path.join('data', 'history_%s.csv' % date)
-        df.to_csv(filename)
+        self._boat.history.to_csv(filename)
         print("Wrote datalog to %s" % filename)

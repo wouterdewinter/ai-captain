@@ -4,6 +4,7 @@ from random import random, uniform
 from tools import rotate_point, add_vector, rotate_vectors
 from autopilot.ai_captain_utils import PilotControl
 from datetime import datetime as dt
+import pandas as pd
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
@@ -27,7 +28,7 @@ class Boat():
         self.x = 250.
         self.y = 250.
         self._env = env
-        self.history = []
+        self.history = pd.DataFrame()
 
         self.shuffle()
 
@@ -103,7 +104,7 @@ class Boat():
         self.move()
 
         # save history
-        self.history.append({
+        self.history = self.history.append([{
             'datetime': dt.now(),
             'boat_angle': self.boat_angle,
             'boat_heel': self.boat_heel,
@@ -114,7 +115,7 @@ class Boat():
             'wind_direction': self._env.wind_direction,
             'wind_speed': self._env.wind_speed,
             'angle_of_attack': self.get_angle_of_attack()
-        })
+        }])
 
         # change target angle
         pressed = pygame.key.get_pressed()
