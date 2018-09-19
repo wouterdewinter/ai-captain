@@ -81,6 +81,6 @@ class Simulator():
                 stop=True
 
         date = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M')
-        filename = os.path.join('data', 'history_%s.csv' % date)
+        filename = os.path.join('data', 'logs', 'history_%s.csv' % date)
         self._boat.history.to_csv(filename)
         print("Wrote datalog to %s" % filename)
