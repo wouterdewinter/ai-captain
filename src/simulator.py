@@ -12,16 +12,20 @@ class Simulator():
     TEXT_COLOR = 255, 255, 255
     SHUFFLE_INTERVAL = 10
 
-    def __init__(self, boat, env, strategy):
+    def __init__(self, boat, env, strategies):
         self._boat = boat
         self._env = env
-        self._strategy = strategy
+        self._strategies = strategies
+
+        # pick first strategy as default
+        self._strategy_id = 0
+        self._strategy = strategies[self._strategy_id]
 
         pygame.init()
         pygame.font.init()
 
         self._font = pygame.font.SysFont('Arial', 30)
-        self._smallfont = pygame.font.SysFont('Arial', 25)
+        self._smallfont = pygame.font.SysFont('Arial', 20)
         self._screen = pygame.display.set_mode(self.SIZE)
 
     def write_text(self, text, row):
@@ -30,10 +34,9 @@ class Simulator():
         self._screen.blit(textsurface, pos)
 
     def run(self):
-        stop = False
         shuffle_time = time.time() + self.SHUFFLE_INTERVAL
 
-        while not stop:
+        while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
 
@@ -60,9 +63,11 @@ class Simulator():
             self.write_text("Wind speed: %.1f knots" % self._env.wind_speed, 9)
             self.write_text("MAE: %.1f°" % mae, 11)
 
+            self.write_text("Strategy: %s" % type(self._strategy).__name__, 13)
+
             textsurface = self._smallfont.render(
-                "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, q to quit", True, self.TEXT_COLOR)
-            self._screen.blit(textsurface, (20, 550))
+                "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, s to change strategy, q to quit", True, self.TEXT_COLOR)
+            self._screen.blit(textsurface, (20, 565))
 
             pygame.display.flip()
 
@@ -75,12 +80,21 @@ class Simulator():
                 self._boat.shuffle()
                 shuffle_time += self.SHUFFLE_INTERVAL
 
+            # check key events
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
 
-            pressed = pygame.key.get_pressed()
-            if pressed[pygame.K_q]:
-                stop=True
+                    # switch strategy
+                    if event.key == pygame.K_s:
+                        self._strategy_id = self._strategy_id + 1 if self._strategy_id < len(self._strategies) - 1 else 0
+                        self._strategy = self._strategies[self._strategy_id]
 
-        date = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M')
-        filename = os.path.join('data', 'logs', 'history_%s.csv' % date)
-        self._boat.history.to_csv(filename)
-        print("Wrote datalog to %s" % filename)
+                    # save log and quit
+                    if event.key == pygame.K_q:
+                        date = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M')
+                        filename = os.path.join('data', 'logs', 'history_%s.csv' % date)
+                        self._boat.history.to_csv(filename)
+                        print("Wrote datalog to %s" % filename)
+                        exit()
+
+
