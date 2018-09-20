@@ -1,3 +1,5 @@
+from threading import Thread
+
 import pygame
 from math import sin, cos, radians
 from random import random, uniform
@@ -6,6 +8,7 @@ from autopilot.ai_captain_utils import PilotControl
 from datetime import datetime as dt
 import pandas as pd
 
+rudder_center = 412
 class Boat():
     WEATHER_HELM_FORCE = 0.02
     BOAT_HEEL_FORCE = 1
@@ -29,7 +32,7 @@ class Boat():
         self.y = 250.
         self._env = env
         self.history = pd.DataFrame()
-
+        self.windspeed_shuffle = True
         self.shuffle()
 
     def shuffle(self):
@@ -154,20 +157,73 @@ class Boat():
         vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
         pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
 
+
+# making threads to keep interface from lagging
+
+def poll_data(result,pilot):
+
+    while True:
+        try:
+            data = pilot.get_data_from_pilot()
+        except Exception as e:
+            print(e)
+            return
+        data = str(data).replace("'","")
+        data = str(data).split(',')
+
+        result['boat_angle'] = float(data[-2])
+        result['rudder_angle'] = -1. * ((int(data[8])-421)/4.8)
+        result['boat_heel'] = abs(float(data[1]))
+        result['speed'] = float(data[-1]) / 1.852
+
+def set_rudder_angle(angle, pilot):
+    translated_target_rudder_angle = int((angle * 4.8) + rudder_center)
+    print(translated_target_rudder_angle)
+    print('setting rudder angle to')
+    pilot.set_rudder_angle(translated_target_rudder_angle)
+    return
+
 class RealBoat(Boat):
-    def __init__(self, env, ip_address='127.0.0.1'):
-        super().__init__(env)
+
+
+    def __init__(self, env, ip_address='192.168.43.185'):
         self._pilot = PilotControl(ip_address=ip_address)
+        super().__init__(env)
+        self.windspeed_shuffle = False
+        self.result = {}
+        self.result['boat_angle'] = 0
+        self.result['rudder_angle'] = 0
+        self.result['boat_heel'] = 0
+        self.result['speed'] = 0
+        self.last_rudder_angle = 0
+        polling_thread = Thread(target=poll_data, args=(self.result, self._pilot),daemon=True)
+        polling_thread.start()
+        self.set_rudder_thread = None
+
 
     def set_target_rudder_angle(self, target_rudder_angle):
         super().set_target_rudder_angle(target_rudder_angle)
-        self._pilot.set_rudder_angle(self.target_rudder_angle)
+        #print('set rudder angle')
+        if self.last_rudder_angle != target_rudder_angle:
+            if self.set_rudder_thread is None or not self.set_rudder_thread.is_alive():
+                print('starting thread')
+                self.set_rudder_thread = Thread(target=set_rudder_angle, args=(target_rudder_angle, self._pilot),
+                                                daemon=True)
+                self.set_rudder_thread.start()
+
+        self.last_rudder_angle = target_rudder_angle
 
     def set_target_angle(self, target_angle):
         super().set_target_angle(target_angle)
-        self._pilot.set_course(self.target_angle)
 
     def move(self):
-        data = self._pilot.get_data_from_pilot()
+
+        self.boat_angle = self.result['boat_angle']
+        self.rudder_angle = self.result['rudder_angle']
+        self.boat_heel = self.result['boat_heel']
+        self.speed = self.result['speed']
+
+
+
         # todo: update speed, rudder angle, heel, course
 
