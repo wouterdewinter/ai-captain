@@ -14,8 +14,8 @@ from more_strategies import *
 env = Environment()
 
 # setup boat
-#boat = Boat(env)
-boat = RealBoat(env,ip_address='192.168.43.185')
+boat = Boat(env)
+# boat = RealBoat(env,ip_address='192.168.43.185')
 
 # setup steering strategies
 strategies = [
