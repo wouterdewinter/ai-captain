@@ -9,6 +9,7 @@ from environment import Environment
 from simulator import Simulator
 from strategies import *
 from my_strategy import *
+from my_deep_strategy import *
 from more_strategies import *
 
 env = Environment()
@@ -19,6 +20,7 @@ boat = Boat(env)
 
 # setup steering strategies
 strategies = [
+    #MyDeepStrategy(boat, env),
     MyStrategy(boat, env),
     Manual(boat, env),
     DoNothing(boat, env),
