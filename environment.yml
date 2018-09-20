@@ -6,6 +6,8 @@ dependencies:
   - python=3.6
   - pandas
   - ipykernel
+  - nb_conda
+  - jupyter
   - matplotlib
   - scikit-learn
   - scikit-image
