@@ -10,12 +10,12 @@ class Simulator():
     SLEEP_TIME = 0.01
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
-    SHUFFLE_INTERVAL = 10
 
-    def __init__(self, boat, env, strategies):
+    def __init__(self, boat, env, strategies, shuffle_interval = 10):
         self._boat = boat
         self._env = env
         self._strategies = strategies
+        self._shuffle_interval = shuffle_interval
 
         # pick first strategy as default
         self._strategy_id = 0
@@ -34,7 +34,7 @@ class Simulator():
         self._screen.blit(textsurface, pos)
 
     def run(self):
-        shuffle_time = time.time() + self.SHUFFLE_INTERVAL
+        shuffle_time = time.time() + self._shuffle_interval
 
         while 1:
             for event in pygame.event.get():
@@ -48,7 +48,8 @@ class Simulator():
             self._boat.draw(self._screen)
             self._env.draw(self._screen)
 
-            mae = mean_absolute_error(self._boat.history.target_angle, self._boat.history.boat_angle)
+            # calculate mean of absolute course error
+            mae = self._boat.history.course_error.abs().mean()
 
             self.write_text("Boat angle: %.1f°" % self._boat.boat_angle, 0)
             self.write_text("Target angle: %.1f°" % self._boat.target_angle, 1)
@@ -74,11 +75,10 @@ class Simulator():
             sleep(self.SLEEP_TIME)
 
             # shuffle once in a while
-            if time.time() > shuffle_time:
-                if self._boat.windspeed_shuffle:
-                    self._env.shuffle()
-                    self._boat.shuffle()
-                shuffle_time += self.SHUFFLE_INTERVAL
+            if self._shuffle_interval and time.time() > shuffle_time:
+                self._env.shuffle()
+                self._boat.shuffle()
+                shuffle_time += self._shuffle_interval
 
             # check key events
             for event in pygame.event.get():

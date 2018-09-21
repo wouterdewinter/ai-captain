@@ -16,11 +16,13 @@ class Environment():
     ARROW_SCALE = 0.2
     CENTER = (250, 250)
 
-    def __init__(self):
+    def __init__(self, wind_speed_var=1.2, wind_direction_var=1.2):
         self.main_wind_speed = 0
         self.main_wind_direction = 0
         self.wind_speed = 0
         self.wind_direction = 0
+        self._wind_speed_var = wind_speed_var
+        self._wind_direction_var = wind_direction_var
         self.shuffle()
 
     def shuffle(self):
@@ -31,14 +33,14 @@ class Environment():
 
     def update(self):
         self.wind_speed += (random() - 0.5) * 2
-        max_wind_speed = self.main_wind_speed * self.WIND_SPEED_VAR
-        min_wind_speed = self.main_wind_speed / self.WIND_SPEED_VAR
+        max_wind_speed = self.main_wind_speed * self._wind_speed_var
+        min_wind_speed = self.main_wind_speed / self._wind_speed_var
         self.wind_speed = min(self.wind_speed, max_wind_speed)
         self.wind_speed = max(self.wind_speed, min_wind_speed)
 
         self.wind_direction += (random() - 0.5) * 2
-        max_wind_dir = self.main_wind_direction * self.WIND_SPEED_VAR
-        min_wind_dir = self.main_wind_direction / self.WIND_SPEED_VAR
+        max_wind_dir = self.main_wind_direction * self._wind_direction_var
+        min_wind_dir = self.main_wind_direction / self._wind_direction_var
         self.wind_direction = min(self.wind_direction, max_wind_dir)
         self.wind_direction = max(self.wind_direction, min_wind_dir)
 

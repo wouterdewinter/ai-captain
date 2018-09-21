@@ -12,11 +12,20 @@ from my_strategy import *
 from my_deep_strategy import *
 from more_strategies import *
 
-env = Environment()
 
 # setup boat
-boat = Boat(env)
-# boat = RealBoat(env,ip_address='192.168.43.185')
+real_boat = len(sys.argv) == 2 and sys.argv[1] == 'real'
+
+if real_boat:
+    print('Using real boat, happy sailing!')
+    env = Environment(wind_speed_var=1, wind_direction_var=1)
+    boat = RealBoat(env,ip_address='172.20.10.6')
+    shuffle_interval = 0
+else:
+    print('Using simulator boat')
+    env = Environment()
+    boat = Boat(env)
+    shuffle_interval = 20
 
 # setup steering strategies
 strategies = [
@@ -30,5 +39,5 @@ strategies = [
 ]
 
 # start the simulator
-sim = Simulator(boat, env, strategies)
+sim = Simulator(boat, env, strategies, shuffle_interval=shuffle_interval)
 sim.run()
