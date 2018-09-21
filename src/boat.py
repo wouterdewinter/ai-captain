@@ -156,6 +156,9 @@ class Boat():
         vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
         pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
 
+#  todo remove!
+rudder_center = 360
+rudder_multiply = 3
 
 # making threads to keep interface from lagging
 def poll_data(result,pilot):
@@ -169,19 +172,19 @@ def poll_data(result,pilot):
         data = str(data).split(',')
 
         result['boat_angle'] = float(data[-2])
-        result['rudder_angle'] = -1. * ((int(data[8])-421)/4.8)
+        result['rudder_angle'] = -1. * ((int(data[8])-rudder_center)/rudder_multiply)
         result['boat_heel'] = abs(float(data[1]))
         result['speed'] = float(data[-1]) / 1.852
-
+        print("raw rudder angle", data[8])
 
 def set_rudder_angle(angle, pilot, rudder_center):
-    translated_target_rudder_angle = int((angle * 4.8) + rudder_center)
+    translated_target_rudder_angle = int((-angle * rudder_multiply) + rudder_center)
     pilot.set_rudder_angle(translated_target_rudder_angle)
     return
 
 
 class RealBoat(Boat):
-    RUDDER_CENTER = 492
+    RUDDER_CENTER = 360
 
     def __init__(self, env, ip_address='192.168.43.185'):
         self._pilot = PilotControl(ip_address=ip_address)
@@ -200,7 +203,7 @@ class RealBoat(Boat):
     def set_target_rudder_angle(self, target_rudder_angle):
         super().set_target_rudder_angle(target_rudder_angle)
 
-        print('setting target rudder angle to: ', target_rudder_angle)
+        #print('setting target rudder angle to: ', target_rudder_angle)
 
         if self.last_rudder_angle != target_rudder_angle:
             if self.set_rudder_thread is None or not self.set_rudder_thread.is_alive():

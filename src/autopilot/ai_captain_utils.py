@@ -78,8 +78,8 @@ class PilotControl(object):
         return page.read()
 
     def set_rudder_angle(self, angle):
-        angle = max(430, angle)
-        angle = min(570, angle)
+        angle = max(155, angle)
+        angle = min(700, angle)
         rudder_angle_url = "http://" + self.ip_address + "/set_rudder/" + str(angle) + "/"
 
         print("sending translated rudder position: ", angle)
