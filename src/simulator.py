@@ -41,7 +41,6 @@ class Simulator():
                 if event.type == pygame.QUIT: sys.exit()
 
             self._screen.fill(self.BG_COLOR)
-
             self._env.update()
             self._boat.update()
             self._strategy.update()
@@ -76,8 +75,9 @@ class Simulator():
 
             # shuffle once in a while
             if time.time() > shuffle_time:
-                self._env.shuffle()
-                self._boat.shuffle()
+                if self._boat.windspeed_shuffle:
+                    self._env.shuffle()
+                    self._boat.shuffle()
                 shuffle_time += self.SHUFFLE_INTERVAL
 
             # check key events

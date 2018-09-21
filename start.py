@@ -16,7 +16,7 @@ env = Environment()
 
 # setup boat
 boat = Boat(env)
-#boat = RealBoat(ip_address='192.168.1.12')
+# boat = RealBoat(env,ip_address='192.168.43.185')
 
 # setup steering strategies
 strategies = [

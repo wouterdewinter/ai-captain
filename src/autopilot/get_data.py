@@ -27,8 +27,10 @@ print(auto_pilot_control.set_course(course))
 with open(path, "w") as f:
     # Write data to file.
     while True:
-
-        f.write(auto_pilot_control.get_data_from_pilot()+"\n")
-        time.sleep(8)
+        data = auto_pilot_control.get_data_from_pilot()
+        if data == '':
+            continue
+        f.write(data+"\n")
+        time.sleep()
 
 
