@@ -176,7 +176,6 @@ def poll_data(result,pilot):
 
 def set_rudder_angle(angle, pilot, rudder_center):
     translated_target_rudder_angle = int((angle * 4.8) + rudder_center)
-    print('setting rudder angle to: ', translated_target_rudder_angle)
     pilot.set_rudder_angle(translated_target_rudder_angle)
     return
 
@@ -200,6 +199,8 @@ class RealBoat(Boat):
 
     def set_target_rudder_angle(self, target_rudder_angle):
         super().set_target_rudder_angle(target_rudder_angle)
+
+        print('setting target rudder angle to: ', target_rudder_angle)
 
         if self.last_rudder_angle != target_rudder_angle:
             if self.set_rudder_thread is None or not self.set_rudder_thread.is_alive():
