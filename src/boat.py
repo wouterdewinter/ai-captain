@@ -8,7 +8,6 @@ from autopilot.ai_captain_utils import PilotControl
 from datetime import datetime as dt
 import pandas as pd
 
-rudder_center = 412
 class Boat():
     WEATHER_HELM_FORCE = 0.02
     BOAT_HEEL_FORCE = 1
@@ -159,9 +158,7 @@ class Boat():
 
 
 # making threads to keep interface from lagging
-
 def poll_data(result,pilot):
-
     while True:
         try:
             data = pilot.get_data_from_pilot()
@@ -176,15 +173,16 @@ def poll_data(result,pilot):
         result['boat_heel'] = abs(float(data[1]))
         result['speed'] = float(data[-1]) / 1.852
 
-def set_rudder_angle(angle, pilot):
+
+def set_rudder_angle(angle, pilot, rudder_center):
     translated_target_rudder_angle = int((angle * 4.8) + rudder_center)
-    print(translated_target_rudder_angle)
-    print('setting rudder angle to')
+    print('setting rudder angle to: ', translated_target_rudder_angle)
     pilot.set_rudder_angle(translated_target_rudder_angle)
     return
 
-class RealBoat(Boat):
 
+class RealBoat(Boat):
+    RUDDER_CENTER = 492
 
     def __init__(self, env, ip_address='192.168.43.185'):
         self._pilot = PilotControl(ip_address=ip_address)
@@ -200,14 +198,13 @@ class RealBoat(Boat):
         polling_thread.start()
         self.set_rudder_thread = None
 
-
     def set_target_rudder_angle(self, target_rudder_angle):
         super().set_target_rudder_angle(target_rudder_angle)
-        #print('set rudder angle')
+
         if self.last_rudder_angle != target_rudder_angle:
             if self.set_rudder_thread is None or not self.set_rudder_thread.is_alive():
                 print('starting thread')
-                self.set_rudder_thread = Thread(target=set_rudder_angle, args=(target_rudder_angle, self._pilot),
+                self.set_rudder_thread = Thread(target=set_rudder_angle, args=(target_rudder_angle, self._pilot, self.RUDDER_CENTER),
                                                 daemon=True)
                 self.set_rudder_thread.start()
 
@@ -222,8 +219,3 @@ class RealBoat(Boat):
         self.rudder_angle = self.result['rudder_angle']
         self.boat_heel = self.result['boat_heel']
         self.speed = self.result['speed']
-
-
-
-        # todo: update speed, rudder angle, heel, course
-
