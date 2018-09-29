@@ -10,10 +10,17 @@ class Polar():
         data = data.set_index('twa')
         data.columns = data.columns.astype('int')
 
+        # process beat and run angles
+        data[data == 0] = np.nan
+        data.index = data.index.astype('int')
+        data = data.groupby(data.index).first()
+
         # interpolate for every wind angle
         idx = np.arange(0, 181, 1)
         data = data.reindex(idx)
-        # todo: assumption, set downwind speed to 80% of speed ar 150 degrees as we don't have the real numbers
+        # todo: assumption, set speeds outside data from polar
+        data.iloc[0] = 0
+        data.iloc[5] = data.iloc[60] * 0.05
         data.iloc[180] = data.iloc[150] * 0.8
         data.interpolate(method='polynomial', order=2, inplace=True)
 
