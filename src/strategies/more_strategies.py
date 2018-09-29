@@ -1,5 +1,5 @@
 import pygame
-from strategies import *
+from .strategies import *
 import os
 from sklearn.externals import joblib
 import pandas as pd

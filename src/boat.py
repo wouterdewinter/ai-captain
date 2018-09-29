@@ -34,6 +34,9 @@ class Boat():
         self.windspeed_shuffle = True
         self.shuffle()
 
+        # frames per second, used to calibrate behaviour across (simulated) boats
+        self._fps = 25
+
     def shuffle(self):
         self.set_target_angle(uniform(0, 360))
 
@@ -156,6 +159,24 @@ class Boat():
         vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
         pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
 
+class SimBoat(Boat):
+
+    # ratio of speed change per second
+    SPEED_CHANGE_RATE = 0.2
+
+    def __init__(self, env, polar):
+        super().__init__(env)
+        self._polar = polar
+        self._speed = 5
+
+    def calculate_speed(self):
+        target_speed = self._polar.get_speed(twa=self.get_angle_of_attack(), tws=self._env.wind_speed)
+        delta = target_speed - self._speed
+
+        self._speed += delta * (self.SPEED_CHANGE_RATE / self._fps)
+
+        return self._speed
+
 #  todo remove!
 rudder_center = 360
 rudder_multiply = 3
@@ -181,7 +202,6 @@ def set_rudder_angle(angle, pilot, rudder_center):
     translated_target_rudder_angle = int((-angle * rudder_multiply) + rudder_center)
     pilot.set_rudder_angle(translated_target_rudder_angle)
     return
-
 
 class RealBoat(Boat):
     RUDDER_CENTER = 360

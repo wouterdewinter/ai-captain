@@ -1,4 +1,4 @@
-from strategies import *
+from .strategies import *
 from keras.models import load_model
 
 class MyDeepStrategy(Base):

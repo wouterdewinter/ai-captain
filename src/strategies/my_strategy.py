@@ -1,4 +1,4 @@
-from strategies import *
+from .strategies import *
 
 class MyStrategy(Base):
     def update(self):
