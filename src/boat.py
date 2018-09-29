@@ -19,6 +19,7 @@ class Boat():
     RUDDER_ORIGIN = [50, 180]
     RUDDER_SHAPE = [[50, 180], [50, 240]]
     ORIGIN = [50, 150]
+    MAX_RUDDER_ANGLE = 30
 
     def __init__(self, env):
         self.rudder_angle = 0.
@@ -57,8 +58,8 @@ class Boat():
         self.target_rudder_angle = target_rudder_angle
 
         # maximize rudder angle
-        self.target_rudder_angle = min(50, self.target_rudder_angle)
-        self.target_rudder_angle = max(-50, self.target_rudder_angle)
+        self.target_rudder_angle = min(self.MAX_RUDDER_ANGLE, self.target_rudder_angle)
+        self.target_rudder_angle = max(-self.MAX_RUDDER_ANGLE, self.target_rudder_angle)
 
     def set_target_angle(self, target_angle):
         target_angle = target_angle + 360 if target_angle<0 else target_angle

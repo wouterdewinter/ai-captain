@@ -29,6 +29,7 @@ else:
 
 # setup steering strategies
 strategies = [
+    TurnSpeed(boat, env),
     Manual(boat, env),
     MyStrategy(boat, env),
     DoNothing(boat, env),
