@@ -35,6 +35,8 @@ class Boat():
         self.windspeed_shuffle = True
         self.shuffle()
 
+        self._position = (52.3611693, 5.0750607)
+
         # frames per second, used to calibrate behaviour across (simulated) boats
         self._fps = 25
 
@@ -104,6 +106,12 @@ class Boat():
         self.boat_angle = self.boat_angle + 360 if self.boat_angle<0 else self.boat_angle
         self.boat_angle = self.boat_angle - 360 if self.boat_angle>360 else self.boat_angle
 
+        # update position
+        lat, lon = self._position
+        lat += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 1000
+        lon += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 1000
+        self._position = (lat, lon)
+
     def update(self):
 
         # simulate or fetch boat movements
@@ -159,6 +167,9 @@ class Boat():
         vectors = [[250, 30], [250, 50]]
         vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
         pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
+
+    def get_position(self):
+        return self._position
 
 class SimBoat(Boat):
 

@@ -16,13 +16,14 @@ class Environment():
     ARROW_SCALE = 0.2
     CENTER = (250, 250)
 
-    def __init__(self, wind_speed_var=1.2, wind_direction_var=1.2):
+    def __init__(self, wind_speed_var=1.2, wind_direction_var=1.2, buoys=None):
         self.main_wind_speed = 0
         self.main_wind_direction = 0
         self.wind_speed = 0
         self.wind_direction = 0
         self._wind_speed_var = wind_speed_var
         self._wind_direction_var = wind_direction_var
+        self._buoys = buoys
         self.shuffle()
 
     def shuffle(self):
@@ -74,3 +75,6 @@ class Environment():
         pygame.draw.polygon(screen, self.ARROW_COLOR, vectors)
 
         pygame.draw.circle(screen, (100, 100, 100), self.CENTER, 200, 5)
+
+    def get_buoys(self):
+        return self._buoys

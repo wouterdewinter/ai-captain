@@ -11,6 +11,9 @@ class Base():
     def update(self):
         raise NotImplementedError()
 
+    def get_boat(self):
+        return self._boat
+
 class Manual(Base):
     STEERING_FORCE = 1
 
