@@ -7,6 +7,7 @@ from tools import rotate_point, add_vector, rotate_vectors
 from autopilot.ai_captain_utils import PilotControl
 from datetime import datetime as dt
 import pandas as pd
+from pygeodesy import formy as geo
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
@@ -20,6 +21,9 @@ class Boat():
     RUDDER_SHAPE = [[50, 180], [50, 240]]
     ORIGIN = [50, 150]
     MAX_RUDDER_ANGLE = 30
+
+    # distance in meters from waypoint to skip to next waypoint
+    DIST_NEXT_WAYPOINT = 50
 
     def __init__(self, env):
         self.rudder_angle = 0.
@@ -36,6 +40,9 @@ class Boat():
         self.shuffle()
 
         self._position = (52.3831693, 5.0750607)
+        self._waypoint = 1
+        self._bearing = 0
+        self._distance = 0
 
         # frames per second, used to calibrate behaviour across (simulated) boats
         self._fps = 25
@@ -108,14 +115,17 @@ class Boat():
 
         # update position
         lat, lon = self._position
-        lat += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
-        lon += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
+        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 30
+        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 30
         self._position = (lat, lon)
 
     def update(self):
 
         # simulate or fetch boat movements
         self.move()
+
+        # run navigation
+        self.nav()
 
         # save history
         self.history = self.history.append([{
@@ -137,6 +147,31 @@ class Boat():
             self.set_target_angle(self.target_angle - 3)
         if pressed[pygame.K_2]:
             self.set_target_angle(self.target_angle + 3)
+
+    def nav(self):
+        """ Update navigation variables and determine new course """
+
+        if self._waypoint is not None:
+            buoys = self._env.get_buoys()
+
+            # get target position from waypoint
+            target_pos = buoys[self._waypoint]
+
+            # determine bearing to waypoint
+            self._bearing = geo.bearing(self._position[0], self._position[1], target_pos[0], target_pos[1])
+
+            # distance to waypoint
+            self._distance = geo.haversine(self._position[0], self._position[1], target_pos[0], target_pos[1])
+
+            # steer to buoy
+            self.set_target_angle(self._bearing)
+
+            # skip to next waypoint if we're there
+            if self._distance < self.DIST_NEXT_WAYPOINT:
+                self._waypoint = self._waypoint + 1 if self._waypoint < len(buoys)-1 else 0
+
+            print("bearing is: ", self._bearing, "distance", self._distance)
+
 
     def draw(self, screen):
         # draw boat

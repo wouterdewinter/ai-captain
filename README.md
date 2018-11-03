@@ -12,6 +12,6 @@ Start jupyter notebook
     cd notebooks
     jupyter notebook
     
-To update dependacies of an existing conda environment run
+To update dependancies of an existing conda environment run
 
     conda env update -f environment.yml 

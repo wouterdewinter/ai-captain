@@ -6,34 +6,36 @@ class RaceDrawer():
 
     def __init__(self, screen):
         self._screen = screen
-        self._offset = (52.3611693 - 0.1, 5.0750607 - 0.1)
-        self._scale = 1000
+        self._offset = (0, 0)
+        self._scale = 0
 
     def autoscale(self, buoys):
-        # get bounding box
+        """ Scale race canvas to fit all buoys """
         lat, lon = zip(*buoys)
 
+        # get bounding positions
         lat1 = min(lat)
         lon1 = min(lon)
         lat2 = max(lat)
         lon2 = max(lon)
 
+        # get bbox dimensions
         dlat = lat2 - lat1
         dlon = lon2 - lon1
 
+        # check aspect ratio
         if dlat > dlon:
             height = dlat
         else:
             height = dlon
 
+        # scale to pixels
         olat = (lat1 + dlat / 2) - height / 2
         olon = (lon1 + dlon / 2) - height / 2
 
         self._offset = (olat, olon)
-
         self._scale = self.RACE_CANVAS_DIM[0] / height
 
-        print (self._offset, self._scale)
 
 
     def translate_pos(self, pos):
