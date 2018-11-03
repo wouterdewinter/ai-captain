@@ -40,16 +40,14 @@ class RaceSimulator():
             self._screen.fill(self.BG_COLOR)
             self._env.update()
 
+            self._drawer.draw_env(self._env)
+            self._drawer.draw_buoys(self._env.get_buoys())
+
             for strategy in self._strategies:
                 strategy.update()
                 boat = strategy.get_boat()
                 boat.update()
                 self._drawer.draw_boat(boat)
-
-            self._drawer.draw_buoys(self._env.get_buoys())
-
-            #self._env.draw(self._screen)
-
 
             # textsurface = self._smallfont.render(
             #     "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, s to change strategy, q to quit", True, self.TEXT_COLOR)

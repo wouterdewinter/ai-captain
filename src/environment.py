@@ -24,7 +24,6 @@ class Environment():
         self._wind_speed_var = wind_speed_var
         self._wind_direction_var = wind_direction_var
         self._buoys = buoys
-        self.shuffle()
 
     def shuffle(self):
         self.main_wind_speed = uniform(5, 25)

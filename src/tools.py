@@ -23,3 +23,9 @@ def rotate_vectors(vectors, angle, center_point=(0, 0), reverse=False):
 
 def add_vector(a, b):
     return [a[0] + b[0], a[1] + b[1]]
+
+def calc_angle(a1, a2):
+    """ Calculate shortest angle between two angles """
+    value = a1 - a2
+    value = (value + 180) % 360 - 180
+    return value

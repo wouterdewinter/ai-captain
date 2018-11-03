@@ -19,8 +19,8 @@ real_boat = len(sys.argv) == 2 and sys.argv[1] == 'real'
 
 # create some buoys
 buoys = [
-    (52.3831693, 5.0750607),
-    (52.3721693, 5.0750607)
+    (52.3721693, 5.0750607),
+    (52.3831693, 5.0750607)
 ]
 
 # create environment
@@ -28,6 +28,7 @@ env = Environment(buoys=buoys)
 
 def create_boat():
     boat = SimBoat(env, polar=polar)
+    boat.set_waypoint(1)
     return boat
 
 # setup steering strategies

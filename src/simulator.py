@@ -36,6 +36,10 @@ class Simulator():
     def run(self):
         shuffle_time = time.time() + self._shuffle_interval
 
+        # initial shuffle
+        self._env.shuffle()
+        self._boat.shuffle()
+
         while 1:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: sys.exit()
