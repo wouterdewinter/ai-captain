@@ -35,7 +35,7 @@ class Boat():
         self.windspeed_shuffle = True
         self.shuffle()
 
-        self._position = (52.3611693, 5.0750607)
+        self._position = (52.3831693, 5.0750607)
 
         # frames per second, used to calibrate behaviour across (simulated) boats
         self._fps = 25
@@ -108,8 +108,8 @@ class Boat():
 
         # update position
         lat, lon = self._position
-        lat += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 1000
-        lon += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 1000
+        lat += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
+        lon += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
         self._position = (lat, lon)
 
     def update(self):

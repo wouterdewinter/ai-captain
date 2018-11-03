@@ -30,6 +30,8 @@ class RaceSimulator():
         self._screen.blit(textsurface, pos)
 
     def run(self):
+        # scale the race canvas
+        self._drawer.autoscale(self._env.get_buoys())
 
         while 1:
             for event in pygame.event.get():
