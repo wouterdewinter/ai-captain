@@ -114,8 +114,8 @@ class Boat():
 
         # update position
         lat, lon = self._position
-        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 100
-        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 100
+        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
+        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
         self._position = (lat, lon)
 
     def update(self):
@@ -164,59 +164,36 @@ class Boat():
         # distance to waypoint
         self._distance = geo.haversine(self._position[0], self._position[1], target_pos[0], target_pos[1])
 
-        # calculate new true wind angle
+        # calculate new true wind angle to steer
         new_twa = calc_angle(self._env.wind_direction, self._bearing)
-
-        #print("new twa", new_twa, "bearing", self._bearing)
 
         # can we steer there directly?
         upwind_angle = 40
         if abs(new_twa) > upwind_angle:
-
             # yes, steer directly to waypoint
             self.set_target_angle(self._bearing)
-
         else:
-            print("upwind")
-            # no, steer upwind course
+            # no, steer an upwind course
             self.set_twa(upwind_angle)
-            #
-            # # should we tack?
-            # wp_angle = calc_angle(self.boat_angle, self._bearing)
-            # if abs(wp_angle) > 2 * upwind_angle:
-            #     # tack, steer upwind course on other tack
-            # else:
-            #
-            # if aoa>0:
-            #     heading = self._env.wind_direction - upwind_angle
-            # else:
-            #     heading = self._env.wind_direction + upwind_angle
-            #
-            # # wrap around
-            # #heading = (heading + 180) % 360 - 180
-            #
-            # # set upwind course
-            # self.set_target_angle(heading)
-            # print("set upwind course", heading, "aoa", aoa, "bearing", self._bearing, "heading", self.boat_angle)
 
         # skip to next waypoint if we're there
         if self._distance < self.DIST_NEXT_WAYPOINT:
             self._waypoint = self._waypoint + 1 if self._waypoint < len(buoys)-1 else 0
 
     def set_twa(self, twa):
+        """ steer a true wind angle on the current tack """
         assert twa >= 0, "twa must be a positive number"
 
-        """ steer a true wind angle on the current tack """
-        current_twa = self.get_angle_of_attack()
-        if current_twa > 0:
-            # port
-            heading = self._env.wind_direction - twa
-        else:
-            # starboard
+        # check true wind angle of target course
+        target_twa = calc_angle(self.target_angle, self._env.wind_direction)
+
+        # check if we're on port or starboard and determine new course
+        if target_twa > 0:
             heading = self._env.wind_direction + twa
+        else:
+            heading = self._env.wind_direction - twa
 
-        print("heading", heading)
-
+        # set new course
         self.set_target_angle(heading)
 
 

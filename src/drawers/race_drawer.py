@@ -13,6 +13,11 @@ class RaceDrawer():
     ARROW_ORIGIN = [150, 100]
     ARROW_SCALE = 0.2
 
+    BOAT_SHAPE = [[50, 0], [100, 150], [75, 200], [25, 200], [0, 150]]
+    BOAT_ORIGIN = [50, 150]
+    BOAT_COLOR = (255, 255, 255)
+    BOAT_SCALE = 0.1
+
     def __init__(self, screen):
         self._screen = screen
         self._offset = (0, 0)
@@ -38,6 +43,9 @@ class RaceDrawer():
         else:
             height = dlon
 
+        # apply some padding
+        height = height * 1.5
+
         # scale to pixels
         olat = (lat1 + dlat / 2) - height / 2
         olon = (lon1 + dlon / 2) - height / 2
@@ -48,8 +56,8 @@ class RaceDrawer():
 
 
     def translate_pos(self, pos):
-        y = self.RACE_CANVAS_DIM[1] - (pos[0]-self._offset[0]) * self._scale
-        x = (pos[1]-self._offset[1]) * self._scale
+        y = self.RACE_CANVAS_DIM[1] - (pos[0]-self._offset[0]) * self._scale + self.RACE_CANVAS_POS[1]
+        x = (pos[1]-self._offset[1]) * self._scale + self.RACE_CANVAS_POS[0]
         return (int(round(x)), int(round(y)))
 
     def draw_env(self, env):
@@ -77,11 +85,22 @@ class RaceDrawer():
 
     def draw_boat(self, boat):
         x, y = self.translate_pos(boat.get_position())
-        pygame.draw.circle(self._screen, (0, 127, 255), (x, y), 20, 4)
+
+        # draw boat
+        vectors = self.BOAT_SHAPE.copy()
+        for i, vector in enumerate(vectors):
+            new_vector = rotate_point(vector, boat.boat_angle, self.BOAT_ORIGIN)
+            vectors[i] = [x + new_vector[0] * self.BOAT_SCALE, y + new_vector[1] * self.BOAT_SCALE]
+
+        pygame.draw.polygon(self._screen, self.BOAT_COLOR, vectors, 1)
+        #pygame.draw.aalines(self._screen, self.BOAT_COLOR, 0, vectors, 2)
+        #pygame.draw.circle(self._screen, (0, 127, 255), (x, y), 20, 4)
+
+
 
     def draw_buoys(self, buoys):
         for position in buoys:
             x, y = self.translate_pos(position)
-            pygame.draw.circle(self._screen, self.BUOY_COLOR, (x, y), 5, 4)
+            pygame.draw.circle(self._screen, self.BUOY_COLOR, (x, y), 5)
 
 

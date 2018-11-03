@@ -5,7 +5,7 @@ from tools import rotate_point
 
 class Environment():
     WIND_SPEED_VAR = 1.2
-    WIND_DIRECTION_VAR = 1.2
+    WIND_DIRECTION_VAR = 1.1
     MAX_WIND_SPEED = 50
     MIN_WIND_SPEED = 2
 
@@ -17,9 +17,9 @@ class Environment():
     CENTER = (250, 250)
 
     def __init__(self, wind_speed_var=1.2, wind_direction_var=1.2, buoys=None):
-        self.main_wind_speed = 0
+        self.main_wind_speed = 20
         self.main_wind_direction = 0
-        self.wind_speed = 0
+        self.wind_speed = 20
         self.wind_direction = 0
         self._wind_speed_var = wind_speed_var
         self._wind_direction_var = wind_direction_var
@@ -39,8 +39,8 @@ class Environment():
         self.wind_speed = max(self.wind_speed, min_wind_speed)
 
         self.wind_direction += (random() - 0.5) * 2
-        max_wind_dir = self.main_wind_direction * self._wind_direction_var
-        min_wind_dir = self.main_wind_direction / self._wind_direction_var
+        max_wind_dir = self.main_wind_direction + (360 * self._wind_direction_var)
+        min_wind_dir = self.main_wind_direction - (360 * self._wind_direction_var)
         self.wind_direction = min(self.wind_direction, max_wind_dir)
         self.wind_direction = max(self.wind_direction, min_wind_dir)
 
