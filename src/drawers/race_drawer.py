@@ -3,7 +3,7 @@ from tools import rotate_point
 
 class RaceDrawer():
     BUOY_COLOR = (253,228,46)
-    RACE_CANVAS_DIM = (500, 500)
+    RACE_CANVAS_DIM = (700, 700)
     RACE_CANVAS_POS = (10, 10)
     RACE_CANVAS_COLOR = (33, 66, 99)
 
@@ -53,8 +53,6 @@ class RaceDrawer():
         self._offset = (olat, olon)
         self._scale = self.RACE_CANVAS_DIM[0] / height
 
-
-
     def translate_pos(self, pos):
         y = self.RACE_CANVAS_DIM[1] - (pos[0]-self._offset[0]) * self._scale + self.RACE_CANVAS_POS[1]
         x = (pos[1]-self._offset[1]) * self._scale + self.RACE_CANVAS_POS[0]
@@ -92,6 +90,7 @@ class RaceDrawer():
             new_vector = rotate_point(vector, boat.boat_angle, self.BOAT_ORIGIN)
             vectors[i] = [x + new_vector[0] * self.BOAT_SCALE, y + new_vector[1] * self.BOAT_SCALE]
 
+        pygame.draw.polygon(self._screen, boat.get_boat_color(), vectors, 0)
         pygame.draw.polygon(self._screen, self.BOAT_COLOR, vectors, 1)
         #pygame.draw.aalines(self._screen, self.BOAT_COLOR, 0, vectors, 2)
         #pygame.draw.circle(self._screen, (0, 127, 255), (x, y), 20, 4)

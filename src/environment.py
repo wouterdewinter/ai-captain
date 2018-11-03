@@ -5,7 +5,7 @@ from tools import rotate_point
 
 class Environment():
     WIND_SPEED_VAR = 1.2
-    WIND_DIRECTION_VAR = 1.1
+    WIND_DIRECTION_VAR = 1.03
     MAX_WIND_SPEED = 50
     MIN_WIND_SPEED = 2
 

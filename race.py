@@ -26,19 +26,24 @@ buoys = [
 # create environment
 env = Environment(buoys=buoys)
 
-def create_boat():
-    boat = SimBoat(env, polar=polar)
+def create_boat(**kwargs):
+    boat = SimBoat(env, polar=polar, random_color=True, **kwargs)
     boat.set_waypoint(1)
     return boat
 
 # setup steering strategies
 strategies = [
-    TurnSpeed(create_boat(), env),
-    MyStrategy(create_boat(), env),
-    DoNothing(create_boat(), env),
-    Binary(create_boat(), env),
-    Smoother(create_boat(), env),
-    Proportional(create_boat(), env),
+#    TurnSpeed(create_boat(), env),
+#    MyStrategy(create_boat(), env),
+#    DoNothing(create_boat(), env),
+#    Binary(create_boat(), env),
+#    Smoother(create_boat(), env),
+    Proportional(create_boat(upwind_twa=35, tack_angle=60, name='35-60'), env),
+    Proportional(create_boat(upwind_twa=38, tack_angle=60, name='38-60'), env),
+    Proportional(create_boat(upwind_twa=40, tack_angle=60, name='40-60'), env),
+    Proportional(create_boat(upwind_twa=38, tack_angle=45, name='38-45'), env),
+    Proportional(create_boat(upwind_twa=38, tack_angle=60, name='38-60'), env),
+    Proportional(create_boat(upwind_twa=48, tack_angle=80, name='38-80'), env),
 ]
 
 # start the simulator

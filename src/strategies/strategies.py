@@ -14,6 +14,9 @@ class Base():
     def get_boat(self):
         return self._boat
 
+    def get_name(self):
+        return type(self).__name__
+
 class Manual(Base):
     STEERING_FORCE = 1
 

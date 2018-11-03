@@ -2,7 +2,7 @@ from threading import Thread
 
 import pygame
 from math import sin, cos, radians
-from random import random, uniform
+from random import random, uniform, randint
 from tools import rotate_point, add_vector, rotate_vectors, calc_angle
 from autopilot.ai_captain_utils import PilotControl
 from datetime import datetime as dt
@@ -23,9 +23,9 @@ class Boat():
     MAX_RUDDER_ANGLE = 30
 
     # distance in meters from waypoint to skip to next waypoint
-    DIST_NEXT_WAYPOINT = 50
+    DIST_NEXT_WAYPOINT = 20
 
-    def __init__(self, env):
+    def __init__(self, env, random_color=False, upwind_twa=40, tack_angle=50, name='no-name'):
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
@@ -38,10 +38,21 @@ class Boat():
         self.history = pd.DataFrame()
         self.windspeed_shuffle = True
 
+        self._upwind_twa = upwind_twa
+        self._tack_angle = tack_angle
+        self._name = name
+
         self._position = (52.3721693, 5.0750607)
         self._waypoint = None
         self._bearing = 0.
         self._distance = 0.
+        self._marks_passed = 0
+
+        # set a boat color
+        if random_color:
+            self._boat_color = randint(30, 255), randint(30, 255), randint(30, 255)
+        else:
+            self._boat_color = 255, 255, 255
 
         # frames per second, used to calibrate behaviour across (simulated) boats
         self._fps = 25
@@ -168,21 +179,30 @@ class Boat():
         new_twa = calc_angle(self._env.wind_direction, self._bearing)
 
         # can we steer there directly?
-        upwind_angle = 40
-        if abs(new_twa) > upwind_angle:
+        if abs(new_twa) > self._upwind_twa:
             # yes, steer directly to waypoint
             self.set_target_angle(self._bearing)
         else:
             # no, steer an upwind course
-            self.set_twa(upwind_angle)
+            # need to tack?
+            diff = calc_angle(self.target_angle, self._bearing)
+            if abs(diff) > self._tack_angle:
+                self.set_twa(self._upwind_twa, tack=True)
+            else:
+                self.set_twa(self._upwind_twa)
 
         # skip to next waypoint if we're there
         if self._distance < self.DIST_NEXT_WAYPOINT:
+            self._marks_passed += 1
             self._waypoint = self._waypoint + 1 if self._waypoint < len(buoys)-1 else 0
 
-    def set_twa(self, twa):
-        """ steer a true wind angle on the current tack """
+    def set_twa(self, twa, tack=False):
+        """ steer a true wind angle on the current (target) tack """
         assert twa >= 0, "twa must be a positive number"
+
+        # set target on the other tack
+        if tack:
+            twa = -twa
 
         # check true wind angle of target course
         target_twa = calc_angle(self.target_angle, self._env.wind_direction)
@@ -196,7 +216,6 @@ class Boat():
         # set new course
         self.set_target_angle(heading)
 
-
     def draw(self, screen):
         # draw boat
         vectors = self.SHAPE.copy()
@@ -204,7 +223,7 @@ class Boat():
             new_vector = rotate_point(vector, self.boat_angle, self.ORIGIN)
             vectors[i] = [self.x + new_vector[0], self.y + new_vector[1]]
 
-        pygame.draw.polygon(screen, self.COLOR, vectors, 0)
+        pygame.draw.polygon(screen, self.get_boat_color(), vectors, 0)
 
         # draw rudder
         vectors = self.RUDDER_SHAPE.copy()
@@ -233,13 +252,26 @@ class Boat():
     def set_waypoint(self, waypoint):
         self._waypoint = waypoint
 
+    def get_boat_color(self):
+        return self._boat_color
+
+    def get_marks_passed(self):
+        return self._marks_passed
+
+    def get_distance_to_waypoint(self):
+        return self._distance
+
+    def get_name(self):
+        return self._name
+
+
 class SimBoat(Boat):
 
     # ratio of speed change per second
     SPEED_CHANGE_RATE = 0.2
 
-    def __init__(self, env, polar):
-        super().__init__(env)
+    def __init__(self, env, polar, random_color=False, **kwargs):
+        super().__init__(env, random_color=random_color, **kwargs)
         self._polar = polar
         self._speed = 5
 
