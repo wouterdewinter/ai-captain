@@ -8,7 +8,7 @@ from drawers.race_drawer import RaceDrawer
 
 class RaceSimulator():
     SIZE = 1024, 768
-    SLEEP_TIME = 0.01
+    SLEEP_TIME = 0.001
     BG_COLOR = 0, 0, 0
     TEXT_COLOR = 255, 255, 255
 

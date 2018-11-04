@@ -125,8 +125,8 @@ class Boat():
 
         # update position
         lat, lon = self._position
-        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
-        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 10
+        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 20
+        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 20
         self._position = (lat, lon)
 
     def update(self):
