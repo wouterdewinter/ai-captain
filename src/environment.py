@@ -26,9 +26,10 @@ class Environment():
 
     def shuffle(self):
         self.main_wind_speed = uniform(5, 25)
-        self.main_wind_direction = uniform(0, 360)
         self.wind_speed = self.main_wind_speed
+        self.main_wind_direction = uniform(0, 360)
         self.wind_direction = self.main_wind_direction
+        self.unwrapped_wind_direction = self.main_wind_direction
 
     def update(self):
         # update wind speed

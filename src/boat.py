@@ -55,7 +55,7 @@ class Boat():
             self._boat_color = 255, 255, 255
 
         # frames per second, used to calibrate behaviour across (simulated) boats
-        self._fps = 25
+        self._fps = 20
 
     def shuffle(self):
         self.set_target_angle(uniform(0, 360))
@@ -86,9 +86,9 @@ class Boat():
         self.target_angle = target_angle
 
     def calculate_speed(self):
-        delta = self._env.wind_direction - self.boat_angle
-        delta = abs((delta + 180) % 360 - 180)
-        speed = sin(radians(delta / 1.2)) *  self._env.wind_speed / 4
+        aoa = abs(self.get_angle_of_attack())
+        speed = sin(radians(aoa / 1.2)) * self._env.wind_speed / 4
+
         # add bonus speed, don't want the boat to stop
         # todo: implement some momentum algorithm
         speed += 1
@@ -268,7 +268,7 @@ class Boat():
 class SimBoat(Boat):
 
     # ratio of speed change per second
-    SPEED_CHANGE_RATE = 0.2
+    SPEED_CHANGE_RATE = 0.5
 
     def __init__(self, env, polar, random_color=False, **kwargs):
         super().__init__(env, random_color=random_color, **kwargs)

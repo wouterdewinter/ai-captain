@@ -25,7 +25,7 @@ else:
     print('Using simulator boat')
     env = Environment()
     boat = SimBoat(env, polar=polar)
-    shuffle_interval = 200
+    shuffle_interval = 20
 
 # setup steering strategies
 strategies = [
