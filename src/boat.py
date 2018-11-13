@@ -146,9 +146,9 @@ class Boat():
         # save history
         self.history = self.history.append([{
             'datetime': dt.now(),
-            'boat_angle': self.boat_angle,
+            'boat_angle': self.boat_angle + np.random.normal(0,1),
             'boat_heel': self.boat_heel,
-            'boat_speed': self.speed,
+            'boat_speed': self.speed + np.random.normal(0,0.25),
             'target_angle': self.target_angle,
             'course_error': self.get_course_error(),
             'rudder_angle': self.rudder_angle,
