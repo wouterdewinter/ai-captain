@@ -23,9 +23,9 @@ class Boat():
     MAX_RUDDER_ANGLE = 30
 
     # distance in meters from waypoint to skip to next waypoint
-    DIST_NEXT_WAYPOINT = 20
+    DIST_NEXT_WAYPOINT = 30
 
-    def __init__(self, env, random_color=False, upwind_twa=40, tack_angle=50, name='no-name'):
+    def __init__(self, env, random_color=False, upwind_twa=40, tack_angle=50, downwind_twa=170, gybe_angle=160, name='no-name'):
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
@@ -38,8 +38,14 @@ class Boat():
         self.history = pd.DataFrame()
         self.windspeed_shuffle = True
 
+        # increase speed of the boat to speedup simulation
+        self._speedup = 10
+
         self._upwind_twa = upwind_twa
+        self._downwind_twa = downwind_twa
         self._tack_angle = tack_angle
+        self._gybe_angle = gybe_angle
+
         self._name = name
 
         self._position = (52.3721693, 5.0750607)
@@ -125,8 +131,8 @@ class Boat():
 
         # update position
         lat, lon = self._position
-        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 20
-        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * 20
+        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * self._speedup
+        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * self._speedup
         self._position = (lat, lon)
 
     def update(self):
@@ -178,18 +184,21 @@ class Boat():
         # calculate new true wind angle to steer
         new_twa = calc_angle(self._env.wind_direction, self._bearing)
 
-        # can we steer there directly?
-        if abs(new_twa) > self._upwind_twa:
-            # yes, steer directly to waypoint
-            self.set_target_angle(self._bearing)
+        # get angles for optimal vmg
+        upwind_twa = self.get_upwind_twa()
+        downwind_twa = self.get_downwind_twa()
+
+        # do need to steer an upwind course?
+        if abs(new_twa) < upwind_twa:
+            self.set_twa(upwind_twa, tack=self.need_to_tack())
+
+        # do need to steer an downwind course?
+        elif abs(new_twa) > downwind_twa:
+            self.set_twa(downwind_twa, tack=self.need_to_tack())
+
+        # otherwise, steer directly to waypoint
         else:
-            # no, steer an upwind course
-            # need to tack?
-            diff = calc_angle(self.target_angle, self._bearing)
-            if abs(diff) > self._tack_angle:
-                self.set_twa(self._upwind_twa, tack=True)
-            else:
-                self.set_twa(self._upwind_twa)
+            self.set_target_angle(self._bearing)
 
         # skip to next waypoint if we're there
         if self._distance < self.DIST_NEXT_WAYPOINT:
@@ -251,6 +260,7 @@ class Boat():
 
     def set_waypoint(self, waypoint):
         self._waypoint = waypoint
+        return self
 
     def get_boat_color(self):
         return self._boat_color
@@ -263,6 +273,20 @@ class Boat():
 
     def get_name(self):
         return self._name
+
+    def get_downwind_twa(self):
+        return self._downwind_twa
+
+    def get_upwind_twa(self):
+        return self._upwind_twa
+
+    def need_to_tack(self):
+        diff = calc_angle(self.target_angle, self._bearing)
+        return abs(diff) > self._tack_angle
+
+    def need_to_gybe(self):
+        diff = calc_angle(self.target_angle, self._bearing)
+        return abs(diff) > self._gybe_angle
 
 
 class SimBoat(Boat):
