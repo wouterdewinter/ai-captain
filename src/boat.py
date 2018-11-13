@@ -148,9 +148,9 @@ class Boat():
         self.history = self.history.append([{
             'datetime': dt.now(),
             'boat_angle': self.boat_angle + np.random.normal(0,1),
-            'boat_heel': self.boat_heel,
+            'boat_heel': self.boat_heel if np.random.uniform(0, 1) < 0.99 else np.nan,
             'boat_speed': self.speed + np.random.normal(0,0.25),
-            'target_angle': self.target_angle,
+            'target_angle': self.target_angle if np.random.uniform(0, 1) < 0.99 else np.nan,
             'course_error': self.get_course_error(),
             'rudder_angle': self.rudder_angle,
             'wind_direction': self._env.wind_direction,
