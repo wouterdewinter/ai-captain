@@ -25,7 +25,7 @@ class Boat():
     # distance in meters from waypoint to skip to next waypoint
     DIST_NEXT_WAYPOINT = 30
 
-    def __init__(self, env, random_color=False, upwind_twa=40, tack_angle=50, downwind_twa=170, gybe_angle=160, name='no-name'):
+    def __init__(self, env, random_color=False, upwind_twa=30, tack_angle=50, downwind_twa=170, gybe_angle=160, name='no-name'):
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
