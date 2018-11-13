@@ -1,6 +1,7 @@
 from threading import Thread
 
 import pygame
+import numpy as np
 from math import sin, cos, radians
 from random import random, uniform, randint
 from tools import rotate_point, add_vector, rotate_vectors, calc_angle
