@@ -1,15 +1,18 @@
+from strategies.turnspeed.strategy import TurnSpeed
+import os
 import pandas as pd
-from boat import SimBoat
 import logging
 
-class PolarBoat(SimBoat):
-    """ Uses information about boat performance """
-
-    def __init__(self, env, polar, angles_file, **kwargs):
-        # load up and downwind angles from file
-        self._angles = pd.read_pickle(angles_file)
-
-        super().__init__(env, polar=polar, **kwargs)
+class MyStrategy(TurnSpeed):
+    def __init__(self, boat, env):
+        super().__init__(boat, env)
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'angles.pkl')
+        if (os.path.isfile(filename)):
+            self._angles = pd.read_pickle(filename)
+        else:
+            # empty dataframe
+            logging.warning("could not lead angles file")
+            self._angles = pd.DataFrame()
 
     def get_downwind_twa(self):
         wind_speed = int(round(self._env.wind_speed))

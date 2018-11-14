@@ -25,7 +25,7 @@ class Boat():
     # distance in meters from waypoint to skip to next waypoint
     DIST_NEXT_WAYPOINT = 30
 
-    def __init__(self, env, random_color=False, upwind_twa=30, tack_angle=50, downwind_twa=170, gybe_angle=160, name='no-name'):
+    def __init__(self, env, random_color=False, tack_angle=50, gybe_angle=160, name='no-name'):
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
@@ -41,8 +41,6 @@ class Boat():
         # increase speed of the boat to speedup simulation
         self._speedup = 10
 
-        self._upwind_twa = upwind_twa
-        self._downwind_twa = downwind_twa
         self._tack_angle = tack_angle
         self._gybe_angle = gybe_angle
 
@@ -62,6 +60,11 @@ class Boat():
 
         # frames per second, used to calibrate behaviour across (simulated) boats
         self._fps = 20
+
+        self._strategy = None
+
+    def set_strategy(self, strategy):
+        self._strategy = strategy
 
     def shuffle(self):
         self.set_target_angle(uniform(0, 360))
@@ -185,8 +188,8 @@ class Boat():
         new_twa = calc_angle(self._env.wind_direction, self._bearing)
 
         # get angles for optimal vmg
-        upwind_twa = self.get_upwind_twa()
-        downwind_twa = self.get_downwind_twa()
+        upwind_twa = self._strategy.get_upwind_twa()
+        downwind_twa = self._strategy.get_downwind_twa()
 
         # do need to steer an upwind course?
         if abs(new_twa) < upwind_twa:
@@ -273,12 +276,6 @@ class Boat():
 
     def get_name(self):
         return self._name
-
-    def get_downwind_twa(self):
-        return self._downwind_twa
-
-    def get_upwind_twa(self):
-        return self._upwind_twa
 
     def need_to_tack(self):
         diff = calc_angle(self.target_angle, self._bearing)
@@ -368,7 +365,6 @@ class RealBoat(Boat):
         super().set_target_angle(target_angle)
 
     def move(self):
-
         self.boat_angle = self.result['boat_angle']
         self.rudder_angle = self.result['rudder_angle']
         self.boat_heel = self.result['boat_heel']

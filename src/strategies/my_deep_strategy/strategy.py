@@ -1,10 +1,12 @@
-from .strategies import *
 from keras.models import load_model
+from strategies.base import Base
+import os
 
 class MyDeepStrategy(Base):
     def __init__(self, boat, env):
         super().__init__(boat, env)
-        self._model = load_model(os.path.join('data', 'my-keras-model.h5'))
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'my-keras-model.h5')
+        self._model = load_model(filename)
 
     def update(self):
         ### CREATE FEATURE DATAFRAME OR NUMPY ARRAY ###

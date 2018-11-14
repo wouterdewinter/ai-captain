@@ -5,10 +5,15 @@ sys.path.insert(1, os.path.join(sys.path[0], 'src'))
 
 # import project code
 from boat import *
-from strategies import *
 from environment import Environment
 from simulator import Simulator
 from polar import Polar
+
+# import configuration
+try:
+    from config import strategy_list
+except ImportError:
+    from config_default import strategy_list
 
 # load polar
 polar = Polar(os.path.join('data', 'polars', 'first-27.csv'))
@@ -25,18 +30,12 @@ else:
     print('Using simulator boat')
     env = Environment()
     boat = SimBoat(env, polar=polar)
-    shuffle_interval = 20
+    shuffle_interval = 10
 
-# setup steering strategies
-strategies = [
-    TurnSpeed(boat, env),
-    Manual(boat, env),
-    MyStrategy(boat, env),
-    DoNothing(boat, env),
-    Binary(boat, env),
-    Smoother(boat, env),
-    Proportional(boat, env),
-]
+# instantiate all strategies
+strategies = []
+for strategy in strategy_list:
+    strategies.append(strategy(boat, env))
 
 # start the simulator
 sim = Simulator(boat, env, strategies, shuffle_interval=shuffle_interval)

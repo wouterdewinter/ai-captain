@@ -1,9 +1,16 @@
-from boats import default, my_boat
+from strategies.my_strategy.strategy import *
+from strategies.proportional.strategy import *
+from strategies.turnspeed.strategy import *
+from strategies.manual.strategy import *
+from strategies.my_deep_strategy.strategy import *
+from strategies.my_ml_strategy.strategy import *
 
-
-def get_strategies(env, polar):
-    """ setup steering strategies """
-    return [
-        my_boat.get_strategy(env, polar),
-        default.get_strategy(env, polar)
-    ]
+# setup steering strategies
+strategy_list = [
+    TurnSpeed,
+    Proportional,
+    MyStrategy,
+    #Manual,
+    #MyDeepStrategy,
+    #MyMlStrategy,
+]

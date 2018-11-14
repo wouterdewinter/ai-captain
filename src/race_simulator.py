@@ -51,7 +51,7 @@ class RaceSimulator():
                 boat.update()
                 self._drawer.draw_boat(boat)
                 scoreboard.append({
-                    'name': boat.get_name(),
+                    'name': strategy.get_name(),
                     'color': boat.get_boat_color(),
                     'marks_passed': boat.get_marks_passed(),
                     'dtw': boat.get_distance_to_waypoint()
