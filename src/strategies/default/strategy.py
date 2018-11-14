@@ -1,6 +1,6 @@
 from strategies.base import Base
 
-class TurnSpeed(Base):
+class Default(Base):
     def update(self):
         if self._boat.history.shape[0] < 3:
             return
@@ -15,7 +15,7 @@ class TurnSpeed(Base):
         target_delta = self._boat.get_course_error() / 10
 
         # maximize turn speed
-        max_turn_speed = 10
+        max_turn_speed = 3
         target_delta = min(target_delta, max_turn_speed)
         target_delta = max(target_delta, -max_turn_speed)
 

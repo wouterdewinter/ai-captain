@@ -7,7 +7,7 @@ class MyMlStrategy(Base):
 
     def __init__(self, boat, env):
         super().__init__(boat, env)
-        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'model.pkl')
+        filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'my-model.pkl')
         self._model = joblib.load(filename)
 
     def update(self):

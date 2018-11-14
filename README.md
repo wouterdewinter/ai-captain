@@ -10,6 +10,10 @@ Run every command from the project directory.
 ### Start the simulator / controller:
 
     python start.py
+
+### Start the race simulator:
+
+    python race.py
     
 ### Start jupyter notebook:
 
@@ -20,7 +24,7 @@ Run every command from the project directory.
     conda env update -f environment.yml 
 
 ## Using your own steering strategies
-You can change the `src/boats/my_boat/my_strategy.py` file to develop your own steering strategy. 
+You can change the `src/strategies/my_strategy/strategy.py` file to develop your own steering strategy. 
 
 ## Adding boats
 If you want to add more boats to the simulator or the race you can add them in the config file:

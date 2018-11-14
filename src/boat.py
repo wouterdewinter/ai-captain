@@ -23,9 +23,9 @@ class Boat():
     MAX_RUDDER_ANGLE = 30
 
     # distance in meters from waypoint to skip to next waypoint
-    DIST_NEXT_WAYPOINT = 30
+    DIST_NEXT_WAYPOINT = 2
 
-    def __init__(self, env, random_color=False, tack_angle=50, gybe_angle=160, name='no-name'):
+    def __init__(self, env, random_color=False, tack_angle=55, gybe_angle=160, name='no-name'):
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
@@ -37,9 +37,6 @@ class Boat():
         self._env = env
         self.history = pd.DataFrame()
         self.windspeed_shuffle = True
-
-        # increase speed of the boat to speedup simulation
-        self._speedup = 10
 
         self._tack_angle = tack_angle
         self._gybe_angle = gybe_angle
@@ -134,8 +131,8 @@ class Boat():
 
         # update position
         lat, lon = self._position
-        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * self._speedup
-        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60 * self._speedup
+        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60
+        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60
         self._position = (lat, lon)
 
     def update(self):

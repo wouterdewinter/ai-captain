@@ -1,9 +1,9 @@
-from strategies.turnspeed.strategy import TurnSpeed
+from strategies.default.strategy import Default
 import os
 import pandas as pd
 import logging
 
-class MyStrategy(TurnSpeed):
+class MyStrategy(Default):
     def __init__(self, boat, env):
         super().__init__(boat, env)
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'angles.pkl')
