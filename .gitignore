@@ -5,3 +5,4 @@ my-keras-model.h5
 my-model.pkl
 config.py
 *.pkl
+notebooks/tools/.ipynb_checkpoints
