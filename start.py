@@ -18,8 +18,8 @@ real_boat = len(sys.argv) == 2 and sys.argv[1] == 'real'
 
 if real_boat:
     print('Using real boat, happy sailing!')
-    env = Environment(wind_speed_var=1, wind_direction_var=1)
-    boat = RealBoat(env,ip_address='172.20.10.6')
+    env = Environment(wind_speed_var=1, wind_direction_var=0)
+    boat = RealBoat(env, ip_address='172.20.10.6')
     shuffle_interval = 0
 else:
     print('Using simulator boat')

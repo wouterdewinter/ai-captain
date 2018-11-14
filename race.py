@@ -4,12 +4,16 @@ import os, sys
 sys.path.insert(1, os.path.join(sys.path[0], 'src'))
 
 # import project code
-from boat import *
-from boats.polar_boat import PolarBoat
 from strategies import *
 from environment import Environment
 from polar import Polar
 from race_simulator import RaceSimulator
+
+# import configuration
+try:
+    from config import get_strategies
+except ImportError:
+    from config_default import get_strategies
 
 # load polar
 polar = Polar(os.path.join('data', 'polars', 'first-27.csv'))
@@ -26,10 +30,7 @@ buoys = [
 env = Environment(buoys=buoys)
 
 # setup steering strategies
-strategies = [
-    Proportional(SimBoat(env, polar=polar, random_color=True, name='normal').set_waypoint(1), env),
-    Proportional(PolarBoat(env, polar=polar, random_color=True, name='polar', angles_file=os.path.join('data', 'angles.pkl')).set_waypoint(1), env),
-]
+strategies = get_strategies(env, polar)
 
 # start the simulator
 sim = RaceSimulator(env, strategies)
