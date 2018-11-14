@@ -11,7 +11,7 @@ class MyStrategy(Default):
             self._angles = pd.read_pickle(filename)
         else:
             # empty dataframe
-            logging.warning("could not lead angles file")
+            logging.warning('could not load angles file')
             self._angles = pd.DataFrame()
 
     def get_downwind_twa(self):
@@ -19,7 +19,7 @@ class MyStrategy(Default):
         if wind_speed in self._angles.index:
             return self._angles.iloc[wind_speed]['downwind_twa']
         else:
-            logging.warning("wind speed out of bounds")
+            logging.warning('wind speed out of bounds')
             return super().get_downwind_twa()
 
     def get_upwind_twa(self):
@@ -27,5 +27,5 @@ class MyStrategy(Default):
         if wind_speed in self._angles.index:
             return self._angles.iloc[wind_speed]['upwind_twa']
         else:
-            logging.warning("wind speed out of bounds")
+            logging.warning('wind speed out of bounds')
             return super().get_upwind_twa()

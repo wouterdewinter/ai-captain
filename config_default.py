@@ -1,5 +1,6 @@
 from strategies.default.strategy import *
 from strategies.my_strategy.strategy import *
+from strategies.my_rule_strategy.strategy import MyRuleStrategy
 from strategies.proportional.strategy import *
 from strategies.turnspeed.strategy import *
 from strategies.manual.strategy import *
@@ -10,6 +11,7 @@ from strategies.my_ml_strategy.strategy import *
 strategy_list = [
     Default,
     MyStrategy,
+    #MyRuleStrategy,
     #MyMlStrategy,
     #MyDeepStrategy,
     #TurnSpeed,
