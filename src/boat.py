@@ -1,6 +1,7 @@
 from threading import Thread
 
 import pygame
+import numpy as np
 from math import sin, cos, radians
 from random import random, uniform, randint
 from tools import rotate_point, add_vector, rotate_vectors, calc_angle
@@ -146,14 +147,14 @@ class Boat():
         # save history
         self.history = self.history.append([{
             'datetime': dt.now(),
-            'boat_angle': self.boat_angle,
-            'boat_heel': self.boat_heel,
-            'boat_speed': self.speed,
-            'target_angle': self.target_angle,
+            'boat_angle': self.boat_angle + np.random.normal(0,1),
+            'boat_heel': self.boat_heel if np.random.uniform(0,1) < 0.99 else np.nan,
+            'boat_speed': self.speed + np.random.normal(0,0.25),
+            'target_angle': self.target_angle if np.random.uniform(0,1) < 0.99 else np.nan,
             'course_error': self.get_course_error(),
             'rudder_angle': self.rudder_angle,
             'wind_direction': self._env.wind_direction,
-            'wind_speed': self._env.wind_speed,
+            'wind_speed': self._env.wind_speed if np.random.uniform(0,1) < 0.99 else np.random.randint(100,150),
             'angle_of_attack': self.get_angle_of_attack()
         }])
 
