@@ -26,7 +26,7 @@ class Boat():
     # distance in meters from waypoint to skip to next waypoint
     DIST_NEXT_WAYPOINT = 2
 
-    def __init__(self, env, random_color=False, tack_angle=55, gybe_angle=160, name='no-name'):
+    def __init__(self, env, random_color=False, name='no-name'):
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
@@ -38,9 +38,6 @@ class Boat():
         self._env = env
         self.history = pd.DataFrame()
         self.windspeed_shuffle = True
-
-        self._tack_angle = tack_angle
-        self._gybe_angle = gybe_angle
 
         self._name = name
 
@@ -191,11 +188,11 @@ class Boat():
 
         # do need to steer an upwind course?
         if abs(new_twa) < upwind_twa:
-            self.set_twa(upwind_twa, tack=self.need_to_tack())
+            self.set_twa(upwind_twa, tack=self._strategy.need_to_tack())
 
         # do need to steer an downwind course?
         elif abs(new_twa) > downwind_twa:
-            self.set_twa(downwind_twa, tack=self.need_to_tack())
+            self.set_twa(downwind_twa, tack=self._strategy.need_to_tack())
 
         # otherwise, steer directly to waypoint
         else:
@@ -274,15 +271,6 @@ class Boat():
 
     def get_name(self):
         return self._name
-
-    def need_to_tack(self):
-        diff = calc_angle(self.target_angle, self._bearing)
-        return abs(diff) > self._tack_angle
-
-    def need_to_gybe(self):
-        diff = calc_angle(self.target_angle, self._bearing)
-        return abs(diff) > self._gybe_angle
-
 
 class SimBoat(Boat):
 
