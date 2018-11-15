@@ -2,8 +2,9 @@ from strategies.base import Base
 import os
 from sklearn.externals import joblib
 import pandas as pd
+from strategies.my_strategy.strategy import *
 
-class MyMlStrategy(Base):
+class MyMlStrategy(MyStrategy):
 
     def __init__(self, boat, env):
         super().__init__(boat, env)
