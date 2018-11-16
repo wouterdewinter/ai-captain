@@ -291,7 +291,7 @@ class SimBoat(Boat):
         return self._speed
 
 #  todo remove!
-rudder_center = 360
+rudder_center = 418
 rudder_multiply = 3
 
 # making threads to keep interface from lagging
