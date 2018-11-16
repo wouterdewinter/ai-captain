@@ -192,7 +192,7 @@ class Boat():
 
         # do need to steer an downwind course?
         elif abs(new_twa) > downwind_twa:
-            self.set_twa(downwind_twa, tack=self._strategy.need_to_tack())
+            self.set_twa(downwind_twa, tack=self._strategy.need_to_gybe())
 
         # otherwise, steer directly to waypoint
         else:
