@@ -1,8 +1,7 @@
 __pycache__
 notebooks/.ipynb_checkpoints
 data/logs
-my-keras-model.h5
-my-model.pkl
+data/datasets
 config.py
-*.pkl
 notebooks/tools/.ipynb_checkpoints
+src/user_strategies
