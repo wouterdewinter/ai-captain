@@ -1,22 +1,16 @@
-from strategies.default.strategy import *
-from strategies.my_strategy.strategy import *
-from strategies.my_rule_strategy.strategy import *
-from strategies.proportional.strategy import *
-from strategies.turnspeed.strategy import *
-from strategies.manual.strategy import *
-from strategies.my_deep_strategy.strategy import *
-from strategies.my_ml_strategy.strategy import *
-from strategies.binary.strategy import *
+from strategies import default
+from strategies import my_strategy
+#from user_strategies import my_strategy
 
 # setup steering strategies
 strategy_list = [
-    Default,
-    MyStrategy,
-    # MyRuleStrategy,
-    # MyMlStrategy,
-    # MyDeepStrategy,
-    # TurnSpeed,
-    # Proportional,
-    # Manual,
-    # Binary,
+    default.Default,
+    my_strategy.MyStrategy,
+    my_strategy.MyRuleStrategy,
+    my_strategy.MyMlStrategy,
+    my_strategy.MyDeepStrategy,
+    # default.TurnSpeed,
+    # default.Proportional,
+    # default.Manual,
+    # default.Binary,
 ]

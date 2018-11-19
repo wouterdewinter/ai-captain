@@ -1,7 +1,8 @@
-from strategies.default.strategy import Default
+from strategies.default import *
 import os
 import pandas as pd
 import logging
+
 
 class MyStrategy(Default):
     def __init__(self, boat, env):

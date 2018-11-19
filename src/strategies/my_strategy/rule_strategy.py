@@ -1,7 +1,8 @@
 from strategies.base import Base
+from .strategy import *
 
 
-class MyRuleStrategy(Base):
+class MyRuleStrategy(MyStrategy):
 
     def update(self):
         ### create your rule based strategy here ###
