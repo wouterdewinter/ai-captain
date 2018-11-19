@@ -9,6 +9,7 @@ from autopilot.ai_captain_utils import PilotControl
 from datetime import datetime as dt
 import pandas as pd
 from pygeodesy import formy as geo
+import logging
 
 class Boat():
     WEATHER_HELM_FORCE = 0.02
@@ -309,15 +310,17 @@ def poll_data(result,pilot):
         result['rudder_angle'] = -1. * ((int(data[8])-rudder_center)/rudder_multiply)
         result['boat_heel'] = abs(float(data[1]))
         result['speed'] = float(data[-1]) / 1.852
-        print("raw rudder angle", data[8])
+
+        logging.info("observed rudder angle (raw: %d, real: %d)" % (int(data[8]), result['rudder_angle']))
 
 def set_rudder_angle(angle, pilot, rudder_center):
     translated_target_rudder_angle = int((-angle * rudder_multiply) + rudder_center)
+    logging.info("setting target rudder angle (raw: %d, real: %d)" % (translated_target_rudder_angle, angle))
     pilot.set_rudder_angle(translated_target_rudder_angle)
     return
 
 class RealBoat(Boat):
-    RUDDER_CENTER = 360
+    RUDDER_CENTER = 418
 
     def __init__(self, env, ip_address='192.168.43.185'):
         self._pilot = PilotControl(ip_address=ip_address)
