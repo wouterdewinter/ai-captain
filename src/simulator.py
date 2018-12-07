@@ -1,15 +1,45 @@
 import os, sys, pygame
 from time import sleep
-import pandas as pd
 import datetime
 import time
-from sklearn.metrics import mean_absolute_error
+import threading
+
+from boat import Boat
+from environment import Environment
+from strategies.base import Base
+
+
+class UpdateThread (threading.Thread):
+    FPS = 5
+
+    def __init__(self, boat:Boat, env:Environment, strategy:Base):
+        threading.Thread.__init__(self)
+        self._boat = boat
+        self._env = env
+        self._strategy = strategy
+
+    def run(self):
+        while 1:
+            # start of update
+            frame_start = time.time()
+
+            self._env.update()
+            self._boat.update()
+            self._strategy.update()
+
+            # calculate sleeping time to get target FPS
+            duration = time.time() - frame_start
+            remaining = 1 / self.FPS - duration
+            remaining = max(remaining, 0)  # no negative sleeps
+            sleep(remaining)
+
 
 class Simulator():
     SIZE = 800, 600
     SLEEP_TIME = 0.01
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
+    FPS = 20
 
     def __init__(self, boat, env, strategies, shuffle_interval = 10):
         self._boat = boat
@@ -40,9 +70,13 @@ class Simulator():
         self._env.shuffle()
         self._boat.shuffle()
 
+        thread = UpdateThread(self._boat, self._env, self._strategy)
+        thread.daemon = True
+        thread.start()
+
         while 1:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: sys.exit()
+            # record start time
+            frame_start = time.time()
 
             self._screen.fill(self.BG_COLOR)
             self._env.update()
@@ -53,7 +87,10 @@ class Simulator():
             self._env.draw(self._screen)
 
             # calculate mean of absolute course error
-            mae = self._boat.history.course_error.abs().mean()
+            if self._boat.history.shape[0] > 0:
+                mae = self._boat.history.course_error.abs().mean()
+            else:
+                mae = 0
 
             self.write_text("Boat angle: %.1f°" % self._boat.boat_angle, 0)
             self.write_text("Target angle: %.1f°" % self._boat.target_angle, 1)
@@ -74,9 +111,6 @@ class Simulator():
             self._screen.blit(textsurface, (20, 565))
 
             pygame.display.flip()
-
-            # sleep
-            sleep(self.SLEEP_TIME)
 
             # shuffle once in a while
             if self._shuffle_interval and time.time() > shuffle_time:
@@ -101,4 +135,8 @@ class Simulator():
                         print("Wrote datalog to %s" % filename)
                         exit()
 
-
+            # calculate sleeping time to get target FPS
+            duration = time.time() - frame_start
+            remaining = 1 / self.FPS - duration
+            remaining = max(remaining, 0)  # no negative sleeps
+            sleep(remaining)
