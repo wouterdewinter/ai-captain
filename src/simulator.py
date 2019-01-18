@@ -1,5 +1,4 @@
-import os, sys, pygame
-from time import sleep
+import os, pygame
 import datetime
 import time
 import threading
@@ -17,26 +16,20 @@ class UpdateThread (threading.Thread):
         self._boat = boat
         self._env = env
         self._strategy = strategy
+        self._clock = pygame.time.Clock()
 
     def run(self):
         while 1:
-            # start of update
-            frame_start = time.time()
-
-            self._env.update()
-            self._boat.update()
+            # update steering strategy
             self._strategy.update()
 
-            # calculate sleeping time to get target FPS
-            duration = time.time() - frame_start
-            remaining = 1 / self.FPS - duration
-            remaining = max(remaining, 0)  # no negative sleeps
-            sleep(remaining)
+            # sleep remainder of frame
+            self._clock.tick(self.FPS)
+            print('update fps: ', self._clock.get_fps())
 
 
-class Simulator():
+class Simulator:
     SIZE = 800, 600
-    SLEEP_TIME = 0.01
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
     FPS = 20
@@ -57,6 +50,7 @@ class Simulator():
         self._font = pygame.font.SysFont('Arial', 30)
         self._smallfont = pygame.font.SysFont('Arial', 20)
         self._screen = pygame.display.set_mode(self.SIZE)
+        self._clock = pygame.time.Clock()
 
     def write_text(self, text, row):
         pos = 500, 30 + (row * 30)
@@ -70,19 +64,16 @@ class Simulator():
         self._env.shuffle()
         self._boat.shuffle()
 
+        # start thread for steering strategy
         thread = UpdateThread(self._boat, self._env, self._strategy)
         thread.daemon = True
         thread.start()
 
         while 1:
-            # record start time
-            frame_start = time.time()
-
+            # redraw everything
             self._screen.fill(self.BG_COLOR)
             self._env.update()
             self._boat.update()
-            self._strategy.update()
-
             self._boat.draw(self._screen)
             self._env.draw(self._screen)
 
@@ -98,18 +89,17 @@ class Simulator():
             self.write_text("Boat heel: %.1f°" % self._boat.boat_heel, 3)
             self.write_text("Rudder angle: %.1f°" % self._boat.rudder_angle, 4)
             self.write_text("Boat speed: %.1f knots" % self._boat.speed, 5)
-
             self.write_text("Angle of attack: %.1f°" % self._boat.get_angle_of_attack(), 6)
             self.write_text("Wind direction: %.1f°" % self._env.wind_direction, 8)
             self.write_text("Wind speed: %.1f knots" % self._env.wind_speed, 9)
             self.write_text("MAE: %.1f°" % mae, 11)
-
             self.write_text("Strategy: %s" % type(self._strategy).__name__, 13)
 
             textsurface = self._smallfont.render(
                 "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, s to change strategy, q to quit", True, self.TEXT_COLOR)
             self._screen.blit(textsurface, (20, 565))
 
+            # display new frame
             pygame.display.flip()
 
             # shuffle once in a while
@@ -135,8 +125,6 @@ class Simulator():
                         print("Wrote datalog to %s" % filename)
                         exit()
 
-            # calculate sleeping time to get target FPS
-            duration = time.time() - frame_start
-            remaining = 1 / self.FPS - duration
-            remaining = max(remaining, 0)  # no negative sleeps
-            sleep(remaining)
+            # sleep for the remainder of this frame
+            self._clock.tick(self.FPS)
+            print('draw fps: ', self._clock.get_fps())

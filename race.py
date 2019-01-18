@@ -10,9 +10,10 @@ from race_simulator import RaceSimulator
 from boat import SimBoat
 
 # import configuration
-try:
+if os.path.isfile('config.py'):
     from config import strategy_list
-except ImportError:
+else:
+    print("Please copy config_default.py to config.py to add your own strategies")
     from config_default import strategy_list
 
 # load polar

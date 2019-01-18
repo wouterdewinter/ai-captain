@@ -1,12 +1,10 @@
-import os, sys, pygame
+import pygame
 from time import sleep
 import pandas as pd
-import datetime
-import time
-from sklearn.metrics import mean_absolute_error
 from drawers.race_drawer import RaceDrawer
 
-class RaceSimulator():
+
+class RaceSimulator:
     SIZE = 1024, 768
     SLEEP_TIME = 0.001
     BG_COLOR = 0, 0, 0
@@ -34,9 +32,6 @@ class RaceSimulator():
         self._drawer.autoscale(self._env.get_buoys())
 
         while 1:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT: sys.exit()
-
             self._screen.fill(self.BG_COLOR)
             self._env.update()
 
