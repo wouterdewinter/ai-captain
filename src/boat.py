@@ -156,13 +156,6 @@ class Boat:
             'angle_of_attack': self.get_angle_of_attack()
         }])
 
-        # change target angle
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_1]:
-            self.set_target_angle(self.target_angle - 3)
-        if pressed[pygame.K_2]:
-            self.set_target_angle(self.target_angle + 3)
-
     def nav(self):
         """ Update navigation variables and determine new course """
 

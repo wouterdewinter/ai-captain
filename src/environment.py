@@ -42,19 +42,5 @@ class Environment:
         self.wind_direction = self.unwrapped_wind_direction + 360 if self.unwrapped_wind_direction < 0 else self.unwrapped_wind_direction
         self.wind_direction = self.unwrapped_wind_direction - 360 if self.unwrapped_wind_direction > 360 else self.unwrapped_wind_direction
 
-        # change target direction
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_3]:
-            self.main_wind_direction -= 1
-        if pressed[pygame.K_4]:
-            self.main_wind_direction += 1
-
-        # change wind speed
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_5] and self.main_wind_speed>self.MIN_WIND_SPEED:
-            self.main_wind_speed -= 1
-        if pressed[pygame.K_6] and self.main_wind_speed<self.MAX_WIND_SPEED:
-            self.main_wind_speed += 1
-
     def get_buoys(self):
         return self._buoys

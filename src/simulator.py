@@ -135,6 +135,28 @@ class Simulator:
                         print("Wrote datalog to %s" % filename)
                         exit()
 
+            # change wind direction
+            # todo implement here
+            # pressed = pygame.key.get_pressed()
+            # if pressed[pygame.K_3]:
+            #     self.main_wind_direction -= 1
+            # if pressed[pygame.K_4]:
+            #     self.main_wind_direction += 1
+            #
+            # # change wind speed
+            # pressed = pygame.key.get_pressed()
+            # if pressed[pygame.K_5] and self.main_wind_speed > self.MIN_WIND_SPEED:
+            #     self.main_wind_speed -= 1
+            # if pressed[pygame.K_6] and self.main_wind_speed < self.MAX_WIND_SPEED:
+            #     self.main_wind_speed += 1
+
+            # change target angle
+            # pressed = pygame.key.get_pressed()
+            # if pressed[pygame.K_1]:
+            #     self.set_target_angle(self.target_angle - 3)
+            # if pressed[pygame.K_2]:
+            #     self.set_target_angle(self.target_angle + 3)
+
             # sleep for the remainder of this frame
             self._clock.tick(Settings.DRAW_FPS)
             fps = self._clock.get_fps()
