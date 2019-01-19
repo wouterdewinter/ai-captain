@@ -1,11 +1,16 @@
 from boat import Boat
 from tools import calc_angle
+from settings import Settings
 
-class Base():
-    def __init__(self, boat:Boat, env):
+
+class Base:
+    """Base strategy"""
+
+    def __init__(self, boat: Boat, env):
         self._boat = boat
         self._env = env
         self._boat.set_strategy(self)
+        self._update_fps = Settings.UPDATE_FPS
 
     def update(self):
         raise NotImplementedError()
@@ -31,3 +36,7 @@ class Base():
         """ Do we need to gybe? """
         diff = calc_angle(self._boat.target_angle, self._boat._bearing)
         return abs(diff) > (180 - self.get_downwind_twa() * 1.5)
+
+    def set_update_fps(self, fps):
+        """Update the number of times the strategy steers per second so strategies can scale calculations accordingly"""
+        self._update_fps = fps

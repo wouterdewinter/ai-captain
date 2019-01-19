@@ -8,7 +8,7 @@ class MyStrategy(Default):
     def __init__(self, boat, env):
         super().__init__(boat, env)
         filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'angles.pkl')
-        if (os.path.isfile(filename)):
+        if os.path.isfile(filename):
             self._angles = pd.read_pickle(filename)
         else:
             # empty dataframe

@@ -1,31 +1,43 @@
 from strategies.base import Base
+import logging
+
 
 class Default(Base):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._last_course_error = None
+
     def update(self):
-        if self._boat.history.shape[0] < 3:
-            return
+        course_error = self._boat.get_course_error()
 
-        last = float(self._boat.history.iloc[-3:-2]['course_error'])
+        # we need a last course error to determine an initial turning rate
+        if self._last_course_error is not None:
+            # calculate turning rate in degrees per second
+            delta = (self._last_course_error - course_error) * self._update_fps
 
-        # calculate turning speed
-        current = self._boat.get_course_error()
-        delta = last-current
+            # calculate target turning speed based on course difference
+            target_delta = course_error / 2
 
-        # calculate target turning speed based on course difference
-        target_delta = self._boat.get_course_error() / 10
+            # maximize turn speed
+            max_target_delta = 30
+            target_delta = min(target_delta, max_target_delta)
+            target_delta = max(target_delta, -max_target_delta)
 
-        # maximize turn speed
-        max_turn_speed = 3
-        target_delta = min(target_delta, max_turn_speed)
-        target_delta = max(target_delta, -max_turn_speed)
+            # steer towards target turning speed
+            steer = (target_delta - delta) / self._update_fps
 
-        # steer towards target turning speed
-        steer = (target_delta - delta) / 2
+            # maximize steering input
+            max_steer = 20 / self._update_fps
+            steer = min(steer, max_steer)
+            steer = max(steer, -max_steer)
 
-        # maximize steering input
-        max_steer = 1
-        steer = min(steer, max_steer)
-        steer = max(steer, -max_steer)
+            # steer the boat
+            self._boat.steer(steer)
 
-        # steer the boat
-        self._boat.steer(steer)
+            # print debugging info
+            logging.debug('delta: %.2f, target delta: %.2f, steer: %.2f, max_steer:  %.2f' % (
+                delta, target_delta, steer, max_steer))
+
+        # save last course error
+        self._last_course_error = course_error

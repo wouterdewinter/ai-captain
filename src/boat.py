@@ -1,20 +1,26 @@
 from threading import Thread
-
 import pygame
 import numpy as np
 from math import sin, cos, radians
-from random import random, uniform, randint
-from tools import rotate_point, add_vector, rotate_vectors, calc_angle
-from autopilot.ai_captain_utils import PilotControl
+from random import uniform, randint
 from datetime import datetime as dt
 import pandas as pd
 from pygeodesy import formy as geo
 import logging
 
-class Boat():
+from tools import rotate_point, add_vector, rotate_vectors, calc_angle
+from autopilot.ai_captain_utils import PilotControl
+from settings import Settings
+
+
+class Boat:
+    """Base class for simulated and real boats"""
+
     WEATHER_HELM_FORCE = 0.02
     BOAT_HEEL_FORCE = 1
-    RUDDER_SPEED = 1
+
+    # degrees rudder angle can change per second
+    RUDDER_SPEED = 20
 
     COLOR = 255, 255, 255
     RUDDER_COLOR = 200, 0, 0
@@ -39,9 +45,7 @@ class Boat():
         self._env = env
         self.history = pd.DataFrame()
         self.windspeed_shuffle = True
-
         self._name = name
-
         self._position = (52.3721693, 5.0750607)
         self._waypoint = None
         self._bearing = 0.
@@ -55,7 +59,8 @@ class Boat():
             self._boat_color = 255, 255, 255
 
         # frames per second, used to calibrate behaviour across (simulated) boats
-        self._fps = 20
+        self._draw_fps = Settings.DRAW_FPS
+        self._update_fps = Settings.UPDATE_FPS
 
         self._strategy = None
 
@@ -115,23 +120,24 @@ class Boat():
         # calculate speed
         self.speed = self.calculate_speed()
 
-        # move rudder
-        if abs(self.target_rudder_angle - self.rudder_angle) < self.RUDDER_SPEED:
+        # move rudder with speed corrected for fps
+        corr_rudder_speed = self.RUDDER_SPEED / self._draw_fps
+        if abs(self.target_rudder_angle - self.rudder_angle) < corr_rudder_speed:
             self.rudder_angle = self.target_rudder_angle
         else:
             if self.target_rudder_angle > self.rudder_angle:
-                self.rudder_angle += self.RUDDER_SPEED
+                self.rudder_angle += corr_rudder_speed
             else:
-                self.rudder_angle -= self.RUDDER_SPEED
+                self.rudder_angle -= corr_rudder_speed
 
         # wrap boat angle
-        self.boat_angle = self.boat_angle + 360 if self.boat_angle<0 else self.boat_angle
-        self.boat_angle = self.boat_angle - 360 if self.boat_angle>360 else self.boat_angle
+        self.boat_angle = self.boat_angle + 360 if self.boat_angle < 0 else self.boat_angle
+        self.boat_angle = self.boat_angle - 360 if self.boat_angle > 360 else self.boat_angle
 
         # update position
         lat, lon = self._position
-        lat += cos(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60
-        lon += sin(radians(self.boat_angle)) * self.speed / self._fps / 3600 / 60
+        lat += cos(radians(self.boat_angle)) * self.speed / self._draw_fps / 3600 / 60
+        lon += sin(radians(self.boat_angle)) * self.speed / self._draw_fps / 3600 / 60
         self._position = (lat, lon)
 
     def update(self):
@@ -273,6 +279,13 @@ class Boat():
     def get_name(self):
         return self._name
 
+    def set_draw_fps(self, fps):
+        self._draw_fps = fps
+
+    def set_update_fps(self, fps):
+        self._update_fps = fps
+
+
 class SimBoat(Boat):
 
     # ratio of speed change per second
@@ -287,13 +300,15 @@ class SimBoat(Boat):
         target_speed = self._polar.get_speed(twa=self.get_angle_of_attack(), tws=self._env.wind_speed)
         delta = target_speed - self._speed
 
-        self._speed += delta * (self.SPEED_CHANGE_RATE / self._fps)
+        self._speed += delta * (self.SPEED_CHANGE_RATE / self._draw_fps)
 
         return self._speed
+
 
 #  todo remove!
 rudder_center = 418
 rudder_multiply = 3
+
 
 # making threads to keep interface from lagging
 def poll_data(result,pilot):
@@ -313,11 +328,13 @@ def poll_data(result,pilot):
 
         logging.info("observed rudder angle (raw: %d, real: %d)" % (int(data[8]), result['rudder_angle']))
 
+
 def set_rudder_angle(angle, pilot, rudder_center):
     translated_target_rudder_angle = int((-angle * rudder_multiply) + rudder_center)
     logging.info("setting target rudder angle (raw: %d, real: %d)" % (translated_target_rudder_angle, angle))
     pilot.set_rudder_angle(translated_target_rudder_angle)
     return
+
 
 class RealBoat(Boat):
     RUDDER_CENTER = 418

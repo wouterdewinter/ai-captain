@@ -10,10 +10,11 @@ from simulator import Simulator
 from polar import Polar
 
 # import configuration
-try:
-    from config import strategy_list
-except ImportError:
-    from config_default import strategy_list
+if os.path.isfile('config.py'):
+    import config
+else:
+    print("Please copy config_default.py to config.py to add your own strategies")
+    import config_default as config
 
 # load polar
 polar = Polar(os.path.join('data', 'polars', 'first-27.csv'))
@@ -34,7 +35,7 @@ else:
 
 # instantiate all strategies
 strategies = []
-for strategy in strategy_list:
+for strategy in config.strategy_list:
     strategies.append(strategy(boat, env))
 
 # start the simulator
