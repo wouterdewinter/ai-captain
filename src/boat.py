@@ -60,7 +60,6 @@ class Boat:
 
         # frames per second, used to calibrate behaviour across (simulated) boats
         self._draw_fps = Settings.DRAW_FPS
-        self._update_fps = Settings.UPDATE_FPS
 
         self._strategy = None
 
@@ -281,9 +280,6 @@ class Boat:
 
     def set_draw_fps(self, fps):
         self._draw_fps = fps
-
-    def set_update_fps(self, fps):
-        self._update_fps = fps
 
 
 class SimBoat(Boat):

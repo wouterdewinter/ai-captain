@@ -11,7 +11,6 @@ from settings import Settings
 
 class UpdateThread (threading.Thread):
     """Thread for updating the steering strategy"""
-    FPS = 5
 
     def __init__(self, boat:Boat, env:Environment, strategy:Base):
         threading.Thread.__init__(self)
@@ -29,9 +28,8 @@ class UpdateThread (threading.Thread):
             self._clock.tick(Settings.UPDATE_FPS)
             fps = self._clock.get_fps()
 
-            # update boat with current fps
+            # update strategy with current fps
             if fps > 0:
-                self._boat.set_update_fps(fps)
                 self._strategy.set_update_fps(fps)
 
 
@@ -41,7 +39,6 @@ class Simulator:
     SIZE = 800, 600
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
-    FPS = 20
 
     def __init__(self, boat, env, strategies, shuffle_interval=10):
         self._boat = boat
