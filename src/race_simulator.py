@@ -88,7 +88,6 @@ class RaceSimulator:
                 # update boat with current fps
                 fps = self._clock.get_fps()
                 if fps > 0:
-                    print(fps)
                     boat.set_draw_fps(fps)
 
             # show scoreboard

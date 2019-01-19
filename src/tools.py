@@ -1,5 +1,6 @@
 from math import sin, cos, radians
 
+
 def rotate_point(point, angle, center_point=(0, 0), reverse=False):
     """Rotates a point around center_point(origin by default)
     Angle is in degrees.
@@ -15,6 +16,7 @@ def rotate_point(point, angle, center_point=(0, 0), reverse=False):
         new_point = (new_point[0] + center_point[0], new_point[1] + center_point[1])
     return new_point
 
+
 def rotate_vectors(vectors, angle, center_point=(0, 0), reverse=False):
     for i, vector in enumerate(vectors):
         vectors[i] = rotate_point(vector, angle, center_point, reverse=reverse)
@@ -23,6 +25,7 @@ def rotate_vectors(vectors, angle, center_point=(0, 0), reverse=False):
 
 def add_vector(a, b):
     return [a[0] + b[0], a[1] + b[1]]
+
 
 def calc_angle(a1, a2):
     """ Calculate shortest angle between two angles """

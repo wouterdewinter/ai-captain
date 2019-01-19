@@ -145,14 +145,14 @@ class Boat:
         # save history
         self.history = self.history.append([{
             'datetime': dt.now(),
-            'boat_angle': self.boat_angle + np.random.normal(0,1),
-            'boat_heel': self.boat_heel if np.random.uniform(0,1) < 0.99 else np.nan,
-            'boat_speed': self.speed + np.random.normal(0,0.25),
-            'target_angle': self.target_angle if np.random.uniform(0,1) < 0.99 else np.nan,
+            'boat_angle': self.boat_angle + np.random.normal(0, 1),
+            'boat_heel': self.boat_heel if np.random.uniform(0, 1) < 0.99 else np.nan,
+            'boat_speed': self.speed + np.random.normal(0, 0.25),
+            'target_angle': self.target_angle if np.random.uniform(0, 1) < 0.99 else np.nan,
             'course_error': self.get_course_error(),
             'rudder_angle': self.rudder_angle,
             'wind_direction': self._env.wind_direction,
-            'wind_speed': self._env.wind_speed if np.random.uniform(0,1) < 0.99 else np.random.randint(100,150),
+            'wind_speed': self._env.wind_speed if np.random.uniform(0, 1) < 0.99 else np.random.randint(100, 150),
             'angle_of_attack': self.get_angle_of_attack()
         }])
 
@@ -249,8 +249,8 @@ class Boat:
 
 class SimBoat(Boat):
 
-    # ratio of speed change per second
-    SPEED_CHANGE_RATE = 0.5
+    # ratio of speed change per second so boat keeps some momentum
+    SPEED_CHANGE_RATE = 0.3
 
     def __init__(self, env, polar, random_color=False, **kwargs):
         super().__init__(env, random_color=random_color, **kwargs)

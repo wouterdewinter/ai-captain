@@ -31,7 +31,7 @@ else:
     print('Using simulator boat')
     env = Environment()
     boat = SimBoat(env, polar=polar)
-    shuffle_interval = 10
+    shuffle_interval = 100
 
 # instantiate all strategies
 strategies = []

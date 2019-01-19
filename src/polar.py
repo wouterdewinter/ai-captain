@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 
 
-class Polar():
+class Polar:
     def __init__(self, filename):
         # load polar csv
         data = pd.read_csv(filename, delimiter=';')
