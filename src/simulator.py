@@ -7,6 +7,7 @@ from boat import Boat
 from environment import Environment
 from strategies.base import Base
 from settings import Settings
+from drawers.sim_drawer import SimDrawer
 
 
 class UpdateThread (threading.Thread):
@@ -56,6 +57,7 @@ class Simulator:
         self._font = pygame.font.SysFont('Arial', 30)
         self._smallfont = pygame.font.SysFont('Arial', 20)
         self._screen = pygame.display.set_mode(self.SIZE)
+        self._drawer = SimDrawer(self._screen)
         self._clock = pygame.time.Clock()
 
     def write_text(self, text, row):
@@ -76,12 +78,14 @@ class Simulator:
         thread.start()
 
         while 1:
-            # redraw everything
-            self._screen.fill(self.BG_COLOR)
+            # update boat and environment
             self._env.update()
             self._boat.update()
-            self._boat.draw(self._screen)
-            self._env.draw(self._screen)
+
+            # redraw objects
+            self._screen.fill(self.BG_COLOR)
+            self._drawer.draw_boat(self._boat)
+            self._drawer.draw_env(self._env)
 
             # calculate mean of absolute course error
             if self._boat.history.shape[0] > 0:

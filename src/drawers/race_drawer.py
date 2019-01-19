@@ -1,7 +1,8 @@
 import pygame
 from tools import rotate_point
 
-class RaceDrawer():
+
+class RaceDrawer:
     BUOY_COLOR = (253,228,46)
     RACE_CANVAS_DIM = (700, 700)
     RACE_CANVAS_POS = (10, 10)
@@ -80,7 +81,6 @@ class RaceDrawer():
 
         pygame.draw.polygon(self._screen, self.ARROW_COLOR, vectors)
 
-
     def draw_boat(self, boat):
         x, y = self.translate_pos(boat.get_position())
 
@@ -92,10 +92,6 @@ class RaceDrawer():
 
         pygame.draw.polygon(self._screen, boat.get_boat_color(), vectors, 0)
         pygame.draw.polygon(self._screen, self.BOAT_COLOR, vectors, 1)
-        #pygame.draw.aalines(self._screen, self.BOAT_COLOR, 0, vectors, 2)
-        #pygame.draw.circle(self._screen, (0, 127, 255), (x, y), 20, 4)
-
-
 
     def draw_buoys(self, buoys):
         for position in buoys:

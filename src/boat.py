@@ -22,12 +22,7 @@ class Boat:
     # degrees rudder angle can change per second
     RUDDER_SPEED = 20
 
-    COLOR = 255, 255, 255
-    RUDDER_COLOR = 200, 0, 0
-    SHAPE = [[50, 0], [100, 150], [75, 200], [25, 200], [0, 150]]
-    RUDDER_ORIGIN = [50, 180]
-    RUDDER_SHAPE = [[50, 180], [50, 240]]
-    ORIGIN = [50, 150]
+    # maximum angle rudder can be in
     MAX_RUDDER_ANGLE = 30
 
     # distance in meters from waypoint to skip to next waypoint
@@ -228,36 +223,6 @@ class Boat:
 
         # set new course
         self.set_target_angle(heading)
-
-    def draw(self, screen):
-        # draw boat
-        vectors = self.SHAPE.copy()
-        for i, vector in enumerate(vectors):
-            new_vector = rotate_point(vector, self.boat_angle, self.ORIGIN)
-            vectors[i] = [self.x + new_vector[0], self.y + new_vector[1]]
-
-        pygame.draw.polygon(screen, self.get_boat_color(), vectors, 0)
-
-        # draw rudder
-        vectors = self.RUDDER_SHAPE.copy()
-        for i, vector in enumerate(vectors):
-
-            # rudder rotation
-            vector = rotate_point(vector, self.rudder_angle, self.RUDDER_ORIGIN)
-            vector = add_vector(vector, self.RUDDER_ORIGIN)
-
-            # boat rotation
-            vector = rotate_point(vector, self.boat_angle, self.ORIGIN)
-
-            # boat position
-            vectors[i] = [self.x + vector[0], self.y + vector[1]]
-
-        pygame.draw.line(screen, self.RUDDER_COLOR, vectors[0], vectors[1], 4)
-
-        # draw target direction
-        vectors = [[250, 30], [250, 50]]
-        vectors = rotate_vectors(vectors, self.target_angle, (250, 250), reverse=True)
-        pygame.draw.line(screen, (0, 255, 0),  vectors[0], vectors[1], 10)
 
     def get_position(self):
         return self._position

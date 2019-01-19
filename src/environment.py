@@ -1,18 +1,10 @@
 import pygame
-from math import sin, cos, radians
 from random import random, uniform
-from tools import rotate_point
 
-class Environment():
+
+class Environment:
     MAX_WIND_SPEED = 50
     MIN_WIND_SPEED = 2
-
-    ARROW_SHAPE = [(0, 100), (0, 200), (200, 200), (200, 300), (300, 150), (200, 0), (200, 100)]
-    ARROW_COLOR = (0, 255, 0)
-    ARROW_POS = [350, 250]
-    ARROW_ORIGIN = [150, 100]
-    ARROW_SCALE = 0.2
-    CENTER = (250, 250)
 
     def __init__(self, wind_speed_var=1.2, wind_direction_var=10, buoys=None):
         self.main_wind_speed = 20
@@ -64,19 +56,5 @@ class Environment():
         if pressed[pygame.K_6] and self.main_wind_speed<self.MAX_WIND_SPEED:
             self.main_wind_speed += 1
 
-    def draw(self, screen):
-        vectors = self.ARROW_SHAPE.copy()
-        for i, vector in enumerate(vectors):
-            vector = rotate_point(vector, self.wind_direction + 90, self.ARROW_ORIGIN)
-            vector = [self.ARROW_POS[0] + vector[0], self.ARROW_POS[1] + vector[1]]
-            vector = [vector[0] * self.ARROW_SCALE, vector[1] * self.ARROW_SCALE]
-            vectors[i] = vector
-
-        # surface = pygame.transform.rotate(screen, self.wind_direction)
-        pygame.draw.polygon(screen, self.ARROW_COLOR, vectors)
-
-        pygame.draw.circle(screen, (100, 100, 100), self.CENTER, 200, 5)
-
     def get_buoys(self):
         return self._buoys
-    
