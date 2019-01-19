@@ -12,7 +12,7 @@ from settings import Settings
 class UpdateThread (threading.Thread):
     """Thread for updating the steering strategy"""
 
-    def __init__(self, boat:Boat, env:Environment, strategy:Base):
+    def __init__(self, boat: Boat, env: Environment, strategy: Base):
         threading.Thread.__init__(self)
         self._boat = boat
         self._env = env

@@ -1,12 +1,36 @@
 import pygame
-from time import sleep
 import pandas as pd
+import threading
+
 from drawers.race_drawer import RaceDrawer
+from settings import Settings
+
+
+class RaceUpdateThread (threading.Thread):
+    """Thread for updating the steering strategy"""
+
+    def __init__(self, strategies):
+        threading.Thread.__init__(self)
+        self._strategies = strategies
+        self._clock = pygame.time.Clock()
+
+    def run(self):
+        while 1:
+            for strategy in self._strategies:
+                # update steering strategy
+                strategy.update()
+
+                # update strategy with current fps
+                fps = self._clock.get_fps()
+                if fps > 0:
+                    strategy.set_update_fps(fps)
+
+            # sleep remainder of frame
+            self._clock.tick(Settings.UPDATE_FPS)
 
 
 class RaceSimulator:
     SIZE = 1024, 768
-    SLEEP_TIME = 0.001
     BG_COLOR = 0, 0, 0
     TEXT_COLOR = 255, 255, 255
 
@@ -21,6 +45,7 @@ class RaceSimulator:
         self._smallfont = pygame.font.SysFont('Arial', 20)
         self._screen = pygame.display.set_mode(self.SIZE)
         self._drawer = RaceDrawer(self._screen)
+        self._clock = pygame.time.Clock()
 
     def write_text(self, text, row, color=(255, 255, 255)):
         pos = 740, 30 + (row * 30)
@@ -30,6 +55,11 @@ class RaceSimulator:
     def run(self):
         # scale the race canvas
         self._drawer.autoscale(self._env.get_buoys())
+
+        # start thread for steering strategy
+        thread = RaceUpdateThread(self._strategies)
+        thread.daemon = True
+        thread.start()
 
         while 1:
             self._screen.fill(self.BG_COLOR)
@@ -41,16 +71,25 @@ class RaceSimulator:
             # update all boats
             scoreboard = []
             for i, strategy in enumerate(self._strategies):
-                strategy.update()
+
+                # update boat and draw
                 boat = strategy.get_boat()
                 boat.update()
                 self._drawer.draw_boat(boat)
+
+                # update scoreboard
                 scoreboard.append({
                     'name': strategy.get_name(),
                     'color': boat.get_boat_color(),
                     'marks_passed': boat.get_marks_passed(),
                     'dtw': boat.get_distance_to_waypoint()
                 })
+
+                # update boat with current fps
+                fps = self._clock.get_fps()
+                if fps > 0:
+                    print(fps)
+                    boat.set_draw_fps(fps)
 
             # show scoreboard
             scoreboard = pd.DataFrame(scoreboard).sort_values(by=['marks_passed', 'dtw'], ascending=[False, True])
@@ -60,10 +99,8 @@ class RaceSimulator:
                 self.write_text(text, i, row.color)
                 i += 1
 
+            # display new frame
             pygame.display.flip()
-
-            # sleep
-            sleep(self.SLEEP_TIME)
 
             # check key events
             for event in pygame.event.get():
@@ -73,4 +110,5 @@ class RaceSimulator:
                     if event.key == pygame.K_q:
                         exit()
 
-
+            # sleep for the remainder of this frame
+            self._clock.tick(Settings.DRAW_FPS)
