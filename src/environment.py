@@ -42,5 +42,14 @@ class Environment:
         self.wind_direction = self.unwrapped_wind_direction + 360 if self.unwrapped_wind_direction < 0 else self.unwrapped_wind_direction
         self.wind_direction = self.unwrapped_wind_direction - 360 if self.unwrapped_wind_direction > 360 else self.unwrapped_wind_direction
 
+    def change_wind_direction(self, amount):
+        self.main_wind_direction += amount
+        self.main_wind_direction = self.main_wind_direction % 360
+
+    def change_wind_speed(self, amount):
+        self.main_wind_speed += amount
+        self.main_wind_speed = max(self.MIN_WIND_SPEED, min(self.MAX_WIND_SPEED, self.main_wind_speed))
+        print(self.main_wind_speed)
+
     def get_buoys(self):
         return self._buoys

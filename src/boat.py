@@ -85,8 +85,7 @@ class Boat:
         self.target_rudder_angle = max(-self.MAX_RUDDER_ANGLE, self.target_rudder_angle)
 
     def set_target_angle(self, target_angle):
-        target_angle = target_angle + 360 if target_angle<0 else target_angle
-        target_angle = target_angle - 360 if target_angle>360 else target_angle
+        target_angle = target_angle % 360
         self.target_angle = target_angle
 
     def calculate_speed(self):

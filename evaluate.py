@@ -1,4 +1,8 @@
 import os
+import sys
+
+# update import path
+sys.path.insert(1, os.path.join(sys.path[0], 'src'))
 
 from boat import *
 from environment import Environment

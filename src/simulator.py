@@ -41,7 +41,7 @@ class Simulator:
     BG_COLOR = 0, 0, 255
     TEXT_COLOR = 255, 255, 255
 
-    def __init__(self, boat, env, strategies, shuffle_interval=10):
+    def __init__(self, boat: Boat, env: Environment, strategies: list, shuffle_interval=10):
         self._boat = boat
         self._env = env
         self._strategies = strategies
@@ -135,27 +135,26 @@ class Simulator:
                         print("Wrote datalog to %s" % filename)
                         exit()
 
+            # check for pressed keys (not the same as key events)
+            pressed = pygame.key.get_pressed()
+
             # change wind direction
-            # todo implement here
-            # pressed = pygame.key.get_pressed()
-            # if pressed[pygame.K_3]:
-            #     self.main_wind_direction -= 1
-            # if pressed[pygame.K_4]:
-            #     self.main_wind_direction += 1
-            #
-            # # change wind speed
-            # pressed = pygame.key.get_pressed()
-            # if pressed[pygame.K_5] and self.main_wind_speed > self.MIN_WIND_SPEED:
-            #     self.main_wind_speed -= 1
-            # if pressed[pygame.K_6] and self.main_wind_speed < self.MAX_WIND_SPEED:
-            #     self.main_wind_speed += 1
+            if pressed[pygame.K_3]:
+                self._env.change_wind_direction(-1)
+            if pressed[pygame.K_4]:
+                self._env.change_wind_direction(1)
+
+            # change wind direction
+            if pressed[pygame.K_5]:
+                self._env.change_wind_speed(-1)
+            if pressed[pygame.K_6]:
+                self._env.change_wind_speed(1)
 
             # change target angle
-            # pressed = pygame.key.get_pressed()
-            # if pressed[pygame.K_1]:
-            #     self.set_target_angle(self.target_angle - 3)
-            # if pressed[pygame.K_2]:
-            #     self.set_target_angle(self.target_angle + 3)
+            if pressed[pygame.K_1]:
+                self._boat.set_target_angle(self._boat.target_angle - 3)
+            if pressed[pygame.K_2]:
+                self._boat.set_target_angle(self._boat.target_angle + 3)
 
             # sleep for the remainder of this frame
             self._clock.tick(Settings.DRAW_FPS)
