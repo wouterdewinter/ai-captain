@@ -3,16 +3,16 @@ channels:
   - cogsci
   - defaults
 dependencies:
-  - python=3.6
-  - pandas
-  - ipykernel
-  - nb_conda
-  - jupyter
-  - matplotlib
-  - scikit-learn
-  - scikit-image
-  - tensorflow
-  - keras
+  - python=3.6.8
+  - pandas=0.23.4
+  - ipykernel=5.1.0
+  - nb_conda=2.2.1
+  - jupyter=1.0.0
+  - matplotlib=3.0.2
+  - scikit-learn=0.20.2
+  - scikit-image=0.14.1
+  - keras=2.2.4
   - pip:
-    - pygame
-    - PyGeodesy
+    - pygame==1.9.4
+    - PyGeodesy==18.10.29
+    - gym==0.10.9
