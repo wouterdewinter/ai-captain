@@ -1,6 +1,7 @@
 import pygame
 import pandas as pd
 import threading
+import tensorflow as tf
 
 from drawers.race_drawer import RaceDrawer
 from settings import Settings
@@ -9,16 +10,20 @@ from settings import Settings
 class RaceUpdateThread (threading.Thread):
     """Thread for updating the steering strategy"""
 
-    def __init__(self, strategies):
+    def __init__(self, strategies, graph):
         threading.Thread.__init__(self)
         self._strategies = strategies
         self._clock = pygame.time.Clock()
+        self._graph = graph
 
     def run(self):
         while 1:
             for strategy in self._strategies:
+
                 # update steering strategy
-                strategy.update()
+                # need to set default graph to enable keras models to run in a different thread
+                with self._graph.as_default():
+                    strategy.update()
 
                 # update strategy with current fps
                 fps = self._clock.get_fps()
@@ -57,7 +62,7 @@ class RaceSimulator:
         self._drawer.autoscale(self._env.get_buoys())
 
         # start thread for steering strategy
-        thread = RaceUpdateThread(self._strategies)
+        thread = RaceUpdateThread(self._strategies, tf.get_default_graph())
         thread.daemon = True
         thread.start()
 
