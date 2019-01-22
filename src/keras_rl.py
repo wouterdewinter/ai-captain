@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+import os
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
@@ -8,6 +9,9 @@ from keras.optimizers import Adam
 from rl.agents.dqn import DQNAgent
 from rl.policy import BoltzmannQPolicy
 from rl.memory import SequentialMemory
+
+# fixed crash that occures after a while, see: https://github.com/openai/spinningup/issues/16
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 import gym_sail
 

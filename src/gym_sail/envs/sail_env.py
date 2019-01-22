@@ -32,11 +32,13 @@ class SailEnv(gym.Env):
 
         self._step = 0
 
+        self._last_course_error = 0
+
     def render(self, mode='human', close=False):
         self._sim.render()
 
     def seed(self, seed=None):
-        self.np_random, seed = seeding.np_random(seed)
+        seed = seeding.np_random(seed)
         return [seed]
 
     def step(self, action):
@@ -53,9 +55,17 @@ class SailEnv(gym.Env):
             # steer right
             self._boat.steer(1)
 
-        reward = 180 - abs(self._boat.get_course_error())
+        # change in course error
+        # delta = abs(self._last_course_error - self._boat.get_course_error())
+        # print (delta)
 
+        reward = ((180 - abs(self._boat.get_course_error())) / 180)
+
+        print(reward)
         self.observation = self._boat.get_course_error(), self._boat.rudder_angle
+
+        # save couse error
+        self._last_course_error = self._boat.get_course_error()
 
         self._step += 1
         done = False
@@ -66,8 +76,6 @@ class SailEnv(gym.Env):
         return self.observation, reward, done, {"debug": 123}
 
     def reset(self):
-        # self.observation = 0
-        # return self.observation
         print("resetting")
         self._boat.reset_rudder()
         self._env.shuffle()
