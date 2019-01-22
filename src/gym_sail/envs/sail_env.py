@@ -16,7 +16,8 @@ class SailEnv(gym.Env):
     def __init__(self):
         self.action_space = spaces.Discrete(3)
 
-        self.observation_space = spaces.Box(low=-180, high=180, shape=(1,))
+        high = np.array([-180, -30])
+        self.observation_space = spaces.Box(low=-high, high=high, dtype=np.float32)
 
         self.seed()
         self.observation = None
@@ -40,7 +41,6 @@ class SailEnv(gym.Env):
 
     def step(self, action):
         assert self.action_space.contains(action)
-        print("action " + str(action))
         if action == 0:
             # do nothing
             pass
@@ -55,15 +55,13 @@ class SailEnv(gym.Env):
 
         reward = 180 - abs(self._boat.get_course_error())
 
-        self.observation = self._boat.get_course_error()
+        self.observation = self._boat.get_course_error(), self._boat.rudder_angle
 
         self._step += 1
         done = False
-        if self._step > 100:
+        if self._step > 300:
             self._step = 0
             done = True
-
-        print(self._step)
 
         return self.observation, reward, done, {"debug": 123}
 
@@ -72,4 +70,6 @@ class SailEnv(gym.Env):
         # return self.observation
         print("resetting")
         self._boat.reset_rudder()
-        return self._boat.get_course_error()
+        self._env.shuffle()
+        self._boat.shuffle()
+        return self._boat.get_course_error(), self._boat.rudder_angle

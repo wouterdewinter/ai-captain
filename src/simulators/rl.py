@@ -75,10 +75,10 @@ class Simulator:
         pygame.display.flip()
 
         # shuffle once in a while
-        if self._shuffle_interval and time.time() > self._shuffle_time:
-            self._env.shuffle()
-            self._boat.shuffle()
-            self._shuffle_time += self._shuffle_interval
+        # if self._shuffle_interval and time.time() > self._shuffle_time:
+        #     self._env.shuffle()
+        #     self._boat.shuffle()
+        #     self._shuffle_time += self._shuffle_interval
 
         # check key events
         for event in pygame.event.get():
@@ -114,9 +114,9 @@ class Simulator:
             self._boat.set_target_angle(self._boat.target_angle + 3)
 
         # sleep for the remainder of this frame
-        self._clock.tick(Settings.DRAW_FPS)
-        fps = self._clock.get_fps()
-
-        # update boat with current fps
-        if fps > 0:
-            self._boat.set_draw_fps(fps)
+        # self._clock.tick(Settings.DRAW_FPS)
+        # fps = self._clock.get_fps()
+        #
+        # # update boat with current fps
+        # if fps > 0:
+        #     self._boat.set_draw_fps(fps)
