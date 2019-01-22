@@ -97,6 +97,10 @@ class Boat:
         speed += 1
         return speed
 
+    def reset_rudder(self):
+        self.target_rudder_angle = 0
+        self.rudder_angle = 0
+
     def move(self):
         """Simulates or fetches movement of boat"""
 

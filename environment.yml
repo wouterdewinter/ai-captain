@@ -16,3 +16,4 @@ dependencies:
     - pygame==1.9.4
     - PyGeodesy==18.10.29
     - gym==0.10.9
+    - keras-rl==0.4.2
