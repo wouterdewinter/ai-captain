@@ -41,9 +41,6 @@ class Simulator:
         self._screen.blit(textsurface, pos)
 
     def render(self):
-        # update boat and environment
-        self._env.update()
-        self._boat.update()
 
         # redraw objects
         self._screen.fill(self.BG_COLOR)

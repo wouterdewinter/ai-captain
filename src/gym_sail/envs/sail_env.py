@@ -16,7 +16,7 @@ class SailEnv(gym.Env):
     def __init__(self):
         self.action_space = spaces.Discrete(3)
 
-        high = np.array([-180, -30])
+        high = np.array([180, 30])
         self.observation_space = spaces.Box(low=-high, high=high, dtype=np.float32)
 
         self.seed()
@@ -43,25 +43,30 @@ class SailEnv(gym.Env):
 
     def step(self, action):
         assert self.action_space.contains(action)
-        if action == 0:
-            # do nothing
-            pass
 
-        elif action == 1:
+        if action == 0:
             # steer left
             self._boat.steer(-1)
+
+        elif action == 1:
+            # do nothing
+            pass
 
         elif action == 2:
             # steer right
             self._boat.steer(1)
 
+        # update boat and environment
+        self._env.update()
+        self._boat.update()
+
         # change in course error
         # delta = abs(self._last_course_error - self._boat.get_course_error())
         # print (delta)
 
-        reward = ((180 - abs(self._boat.get_course_error())) / 180)
+        reward = -abs(self._boat.get_course_error() / 180)
 
-        print(reward)
+        # print(reward)
         self.observation = self._boat.get_course_error(), self._boat.rudder_angle
 
         # save couse error
