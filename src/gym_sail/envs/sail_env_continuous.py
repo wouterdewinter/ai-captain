@@ -10,13 +10,11 @@ from environment import Environment
 from polar import Polar
 
 
-class SailEnv(gym.Env):
+class SailEnvContinuous(gym.Env):
     metadata = {'render.modes': ['human']}
 
     def __init__(self):
-        self.action_space = spaces.Discrete(3)
-
-        #high = np.array([180, 30, 180])
+        self.action_space = spaces.Box(low=-30, high=30, shape=(1,), dtype=np.float32)
         self.observation_space = spaces.Box(low=-1, high=1, shape=(2,), dtype=np.float32)
 
         self.seed()
@@ -43,18 +41,8 @@ class SailEnv(gym.Env):
 
     def step(self, action):
         assert self.action_space.contains(action)
-
-        if action == 0:
-            # steer left
-            self._boat.steer(-1)
-
-        elif action == 1:
-            # do nothing
-            pass
-
-        elif action == 2:
-            # steer right
-            self._boat.steer(1)
+        action = action * 30
+        self._boat.set_target_rudder_angle(int(action))
 
         # update boat and environment
         self._env.update()
