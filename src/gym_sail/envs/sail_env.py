@@ -4,7 +4,6 @@ from gym.utils import seeding
 import numpy as np
 import os
 
-from simulators.rl import Simulator
 from boat import *
 from environment import Environment
 from polar import Polar

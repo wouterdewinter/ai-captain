@@ -6,7 +6,7 @@ sys.path.insert(1, os.path.join(sys.path[0], 'src'))
 # import project code
 from environment import Environment
 from polar import Polar
-from race_simulator import RaceSimulator
+from simulators.race_simulator import RaceSimulator
 from boat import SimBoat
 
 # import configuration
