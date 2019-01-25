@@ -29,12 +29,12 @@ class Base:
 
     def need_to_tack(self) -> bool:
         """ Do we need to tack? """
-        diff = calc_angle(self._boat.target_angle, self._boat._bearing)
+        diff = calc_angle(self._boat.target_angle, self._boat.get_bearing_to_waypoint())
         return abs(diff) > self.get_upwind_twa() * 1.5
 
     def need_to_gybe(self) -> bool:
         """ Do we need to gybe? """
-        diff = calc_angle(self._boat.target_angle, self._boat._bearing)
+        diff = calc_angle(self._boat.target_angle, self._boat.get_bearing_to_waypoint())
         return abs(diff) > (180 - self.get_downwind_twa() * 1.5)
 
     def set_update_fps(self, fps):

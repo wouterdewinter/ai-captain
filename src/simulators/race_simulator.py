@@ -39,12 +39,13 @@ class RaceSimulator:
     def __init__(self, env, strategies):
         self._env = env
         self._strategies = strategies
-        self._drawer = RaceDrawer(strategies, env)
+
+        boats = [strategy.get_boat() for strategy in strategies]
+
+        self._drawer = RaceDrawer(boats, env)
         self._clock = pygame.time.Clock()
 
     def run(self):
-        # scale the race canvas
-        self._drawer.autoscale(self._env.get_buoys())
 
         # start thread for steering strategy
         thread = RaceUpdateThread(self._strategies, tf.get_default_graph())

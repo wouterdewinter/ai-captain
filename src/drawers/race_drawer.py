@@ -25,8 +25,8 @@ class RaceDrawer:
     BG_COLOR = 0, 0, 0
     TEXT_COLOR = 255, 255, 255
 
-    def __init__(self, strategies: list, env: Environment):
-        self._strategies = strategies
+    def __init__(self, boats: list, env: Environment):
+        self._boats = boats
         self._env = env
         self._offset = (0, 0)
         self._scale = 0
@@ -37,6 +37,9 @@ class RaceDrawer:
         self._font = pygame.font.SysFont('Arial', 30)
         self._smallfont = pygame.font.SysFont('Arial', 20)
         self._screen = pygame.display.set_mode(self.SIZE)
+
+        # scale the race canvas
+        self.autoscale(self._env.get_buoys())
 
     def autoscale(self, buoys):
         """ Scale race canvas to fit all buoys """
@@ -124,15 +127,14 @@ class RaceDrawer:
 
         # draw all boats
         scoreboard = []
-        for i, strategy in enumerate(self._strategies):
+        for boat in self._boats:
 
             # update boat and draw
-            boat = strategy.get_boat()
             self.draw_boat(boat)
 
             # update scoreboard
             scoreboard.append({
-                'name': strategy.get_name(),
+                'name': boat.get_name(),
                 'color': boat.get_boat_color(),
                 'marks_passed': boat.get_marks_passed(),
                 'dtw': boat.get_distance_to_waypoint()
