@@ -8,6 +8,7 @@ from simulators.rl import Simulator
 from boat import *
 from environment import Environment
 from polar import Polar
+from drawers.sim_drawer import SimDrawer
 
 
 class SailEnvContinuous(gym.Env):
@@ -23,17 +24,20 @@ class SailEnvContinuous(gym.Env):
         # start simulator
         polar = Polar(os.path.join('..', 'data', 'polars', 'first-27.csv'))
         self._env = Environment()
-        self._boat = SimBoat(self._env, polar=polar)
-        self._sim = Simulator(self._boat, self._env)
+        self._boat = SimBoat(self._env, polar=polar, keep_log=False)
+        self._drawer = SimDrawer()
 
         self.reset()
-
         self._step = 0
 
-        self._last_course_error = 0
-
     def render(self, mode='human', close=False):
-        self._sim.render()
+        self._drawer.draw(self._boat, self._env)
+
+        # should we quit?
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    exit()
 
     def seed(self, seed=None):
         seed = seeding.np_random(seed)
@@ -48,14 +52,7 @@ class SailEnvContinuous(gym.Env):
         self._env.update()
         self._boat.update()
 
-        # change in course error
-        # delta = abs(self._last_course_error - self._boat.get_course_error())
-        # print (delta)
-
         reward = -abs(self._boat.get_course_error() / 180)
-
-        # save couse error
-        #self._last_course_error = self._boat.get_course_error()
 
         self._step += 1
         done = False

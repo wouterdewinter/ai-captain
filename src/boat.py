@@ -28,7 +28,10 @@ class Boat:
     # distance in meters from waypoint to skip to next waypoint
     DIST_NEXT_WAYPOINT = 2
 
-    def __init__(self, env, random_color=False, name='no-name'):
+    def __init__(self, env, random_color=False, name='no-name', keep_log=True):
+        self._keep_log = keep_log
+        self._name = name
+
         self.rudder_angle = 0.
         self.target_rudder_angle = 0.
         self.boat_angle = 0.
@@ -40,7 +43,6 @@ class Boat:
         self._env = env
         self.history = pd.DataFrame()
         self.windspeed_shuffle = True
-        self._name = name
         self._position = (52.3721693, 5.0750607)
         self._waypoint = None
         self._bearing = 0.
@@ -146,18 +148,19 @@ class Boat:
         self.nav()
 
         # save history
-        self.history = self.history.append([{
-            'datetime': dt.now(),
-            'boat_angle': self.boat_angle + np.random.normal(0, 1),
-            'boat_heel': self.boat_heel if np.random.uniform(0, 1) < 0.99 else np.nan,
-            'boat_speed': self.speed + np.random.normal(0, 0.25),
-            'target_angle': self.target_angle if np.random.uniform(0, 1) < 0.99 else np.nan,
-            'course_error': self.get_course_error(),
-            'rudder_angle': self.rudder_angle,
-            'wind_direction': self._env.wind_direction,
-            'wind_speed': self._env.wind_speed if np.random.uniform(0, 1) < 0.99 else np.random.randint(100, 150),
-            'angle_of_attack': self.get_angle_of_attack()
-        }])
+        if self._keep_log:
+            self.history = self.history.append([{
+                'datetime': dt.now(),
+                'boat_angle': self.boat_angle + np.random.normal(0, 1),
+                'boat_heel': self.boat_heel if np.random.uniform(0, 1) < 0.99 else np.nan,
+                'boat_speed': self.speed + np.random.normal(0, 0.25),
+                'target_angle': self.target_angle if np.random.uniform(0, 1) < 0.99 else np.nan,
+                'course_error': self.get_course_error(),
+                'rudder_angle': self.rudder_angle,
+                'wind_direction': self._env.wind_direction,
+                'wind_speed': self._env.wind_speed if np.random.uniform(0, 1) < 0.99 else np.random.randint(100, 150),
+                'angle_of_attack': self.get_angle_of_attack()
+            }])
 
     def nav(self):
         """ Update navigation variables and determine new course """
