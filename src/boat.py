@@ -160,7 +160,7 @@ class Boat:
         # skip to next waypoint if we're there
         if self._waypoint is not None:
             if self.get_distance_to_waypoint() < self.DIST_NEXT_WAYPOINT:
-                print("hit waypoint!")
+                logging.info("hit waypoint")
                 self._marks_passed += 1
                 self._waypoint = self._waypoint + 1 if self._waypoint < len(self._env.get_buoys()) - 1 else 0
 

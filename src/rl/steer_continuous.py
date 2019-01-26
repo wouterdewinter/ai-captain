@@ -64,7 +64,7 @@ agent.compile(Adam(lr=.001, clipnorm=1.), metrics=['mae'])
 # Ctrl + C.
 #agent.fit(env, nb_steps=50000, visualize=False, verbose=1, nb_max_episode_steps=200)
 
-model_filename = os.path.join('..', 'data', 'models', 'ddpg_{}_weights.h5f'.format(ENV_NAME))
+model_filename = os.path.join('..', '..', 'data', 'models', 'ddpg_{}_weights.h5f'.format(ENV_NAME))
 agent.load_weights(model_filename)
 
 # After training is done, we save the final weights.
