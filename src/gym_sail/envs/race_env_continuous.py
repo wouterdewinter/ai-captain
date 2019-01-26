@@ -23,7 +23,7 @@ class RaceEnvContinuous(gym.Env):
         self.observation = None
 
         # start simulator
-        polar = Polar(os.path.join('..', '..', 'data', 'polars', 'first-27.csv'))
+        polar = Polar(os.path.join('data', 'polars', 'first-27.csv'))
         self._env = Environment(buoys=Settings.BUOYS)
         self._boat = SimBoat(self._env, polar=polar, keep_log=False).set_waypoint(1)
         self._drawer = RaceDrawer([self._boat], self._env)

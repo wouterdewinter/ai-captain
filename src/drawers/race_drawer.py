@@ -1,7 +1,9 @@
 import pygame
+import pandas as pd
+import os.path
+
 from tools import rotate_point
 from environment import Environment
-import pandas as pd
 
 
 class RaceDrawer:
@@ -11,7 +13,7 @@ class RaceDrawer:
     RACE_CANVAS_COLOR = (33, 66, 99)
 
     ARROW_SHAPE = [(0, 100), (0, 200), (200, 200), (200, 300), (300, 150), (200, 0), (200, 100)]
-    ARROW_COLOR = (0, 255, 0)
+    ARROW_COLOR = (9, 209, 97)
     ARROW_POS = [350, 250]
     ARROW_ORIGIN = [150, 100]
     ARROW_SCALE = 0.2
@@ -21,7 +23,7 @@ class RaceDrawer:
     BOAT_COLOR = (255, 255, 255)
     BOAT_SCALE = 0.1
 
-    SIZE = 1024, 768
+    SIZE = 1100, 730
     BG_COLOR = 0, 0, 0
     TEXT_COLOR = 255, 255, 255
 
@@ -34,8 +36,8 @@ class RaceDrawer:
         pygame.init()
         pygame.font.init()
 
-        self._font = pygame.font.SysFont('Arial', 30)
-        self._smallfont = pygame.font.SysFont('Arial', 20)
+        self._font = pygame.font.Font(os.path.join('fonts', 'B612-Regular.ttf'), 20)
+        self._smallfont = pygame.font.Font(os.path.join('fonts', 'B612-Regular.ttf'), 15)
         self._screen = pygame.display.set_mode(self.SIZE)
 
         # scale the race canvas
