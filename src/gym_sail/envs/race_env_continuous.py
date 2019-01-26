@@ -78,4 +78,5 @@ class RaceEnvContinuous(gym.Env):
         self._boat.reset_rudder()
         self._boat.reset_boat_position()
         self._boat.set_heading(random.randint(-90, 90))
+        self._boat.set_waypoint(1)
         return self.get_observation()

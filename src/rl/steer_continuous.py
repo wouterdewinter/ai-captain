@@ -1,5 +1,6 @@
 import numpy as np
 import gym
+import os.path
 
 from keras.models import Sequential, Model
 from keras.layers import Dense, Activation, Flatten, Input, Concatenate
@@ -61,10 +62,13 @@ agent.compile(Adam(lr=.001, clipnorm=1.), metrics=['mae'])
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
-agent.fit(env, nb_steps=50000, visualize=False, verbose=1, nb_max_episode_steps=200)
+#agent.fit(env, nb_steps=50000, visualize=False, verbose=1, nb_max_episode_steps=200)
+
+model_filename = os.path.join('..', 'data', 'models', 'ddpg_{}_weights.h5f'.format(ENV_NAME))
+agent.load_weights(model_filename)
 
 # After training is done, we save the final weights.
-agent.save_weights('ddpg_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
+#agent.save_weights(model_filename, overwrite=True)
 
 # Finally, evaluate our algorithm for 5 episodes.
-agent.test(env, nb_episodes=5, visualize=True, nb_max_episode_steps=200)
+agent.test(env, nb_episodes=100, visualize=True, nb_max_episode_steps=200)

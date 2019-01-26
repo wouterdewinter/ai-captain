@@ -158,7 +158,7 @@ class Boat:
             self.nav()
 
         # skip to next waypoint if we're there
-        if self._waypoint:
+        if self._waypoint is not None:
             if self.get_distance_to_waypoint() < self.DIST_NEXT_WAYPOINT:
                 print("hit waypoint!")
                 self._marks_passed += 1
@@ -231,7 +231,10 @@ class Boat:
         return self._position
 
     def set_waypoint(self, waypoint):
+        """set new waypoint, also resets number of marks passed"""
+
         self._waypoint = waypoint
+        self._marks_passed = 0
         return self
 
     def get_boat_color(self):

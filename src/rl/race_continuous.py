@@ -16,7 +16,7 @@ import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
 
-LOAD = False
+LOAD = True
 
 # Get the environment and extract the number of actions.
 env = gym.make(ENV_NAME)
@@ -30,11 +30,11 @@ nb_actions = env.action_space.shape[0]
 # todo back to linear activation?
 actor = Sequential()
 actor.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-actor.add(Dense(16))
+actor.add(Dense(32))
 actor.add(Activation('relu'))
-actor.add(Dense(16))
+actor.add(Dense(32))
 actor.add(Activation('relu'))
-actor.add(Dense(16))
+actor.add(Dense(32))
 actor.add(Activation('relu'))
 actor.add(Dense(nb_actions))
 actor.add(Activation('tanh'))
@@ -64,18 +64,18 @@ agent = DDPGAgent(nb_actions=nb_actions, actor=actor, critic=critic, critic_acti
                   random_process=random_process, gamma=.99, target_model_update=1e-3)
 agent.compile(Adam(lr=.001, clipnorm=1.), metrics=['mae'])
 
-# file to save or load weights
-model_filename = os.path.join('..', 'data', 'models', 'ddpg_%s_%d_weights.h5f' % (ENV_NAME, int(time.time())))
-
 if LOAD:
     # load weights
+    t = 1548451946
+    model_filename = os.path.join('..', 'data', 'models', 'ddpg_%s_%d_weights.h5f' % (ENV_NAME, t))
     agent.load_weights(model_filename)
 else:
     # train
-    agent.fit(env, nb_steps=1000000, visualize=False, verbose=1, nb_max_episode_steps=3000)
+    agent.fit(env, nb_steps=10000000, visualize=False, verbose=1, nb_max_episode_steps=4000)
 
     # After training is done, we save the final weights.
+    model_filename = os.path.join('..', '..', 'data', 'models', 'ddpg_%s_%d_weights.h5f' % (ENV_NAME, int(time.time())))
     agent.save_weights(model_filename, overwrite=True)
 
 # Finally, evaluate our algorithm for 5 episodes.
-agent.test(env, nb_episodes=100, visualize=True, nb_max_episode_steps=3000)
+agent.test(env, nb_episodes=100, visualize=True, nb_max_episode_steps=4000)
