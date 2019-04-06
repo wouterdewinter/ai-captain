@@ -22,6 +22,9 @@ class UpdateThread (threading.Thread):
         self._clock = pygame.time.Clock()
         self._graph = graph
 
+    def set_strategy(self, strategy: Base):
+        self._strategy = strategy
+
     def run(self):
         while 1:
             # update steering strategy
@@ -72,7 +75,7 @@ class Simulator:
             self._boat.update()
 
             # redraw objects
-            self._drawer.draw(self._boat, self._env)
+            self._drawer.draw(self._boat, self._env, self._strategy)
 
             # shuffle once in a while
             if self._shuffle_interval and time.time() > shuffle_time:
@@ -88,6 +91,7 @@ class Simulator:
                     if event.key == pygame.K_s:
                         self._strategy_id = self._strategy_id + 1 if self._strategy_id < len(self._strategies) - 1 else 0
                         self._strategy = self._strategies[self._strategy_id]
+                        thread.set_strategy(self._strategy)
 
                     # save log and quit
                     if event.key == pygame.K_q:
