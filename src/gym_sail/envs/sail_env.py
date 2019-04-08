@@ -22,7 +22,7 @@ class SailEnv(gym.Env):
         self.observation = None
 
         # start simulator
-        polar = Polar(os.path.join('..', '..', 'data', 'polars', 'first-27.csv'))
+        polar = Polar(os.path.join('data', 'polars', 'first-27.csv'))
         self._env = Environment()
         self._boat = SimBoat(self._env, polar=polar, keep_log=False)
         self._drawer = SimDrawer()
@@ -31,7 +31,7 @@ class SailEnv(gym.Env):
         self._step = 0
 
     def render(self, mode='human', close=False):
-        self._drawer.draw(self._boat, self._env)
+        self._drawer.draw(self._boat, self._env, 'SailEnv')
 
         # should we quit?
         for event in pygame.event.get():

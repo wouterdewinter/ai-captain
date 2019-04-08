@@ -3,7 +3,6 @@ import pygame
 from boat import Boat
 from environment import Environment
 from tools import rotate_point, add_vector, rotate_vectors
-from strategies.base import Base
 
 
 class SimDrawer:
@@ -84,7 +83,7 @@ class SimDrawer:
         textsurface = self._font.render(text, True, self.TEXT_COLOR)
         self._screen.blit(textsurface, pos)
 
-    def draw_stats(self, boat, env, strategy: Base):
+    def draw_stats(self, boat, env, strategy_name):
         # calculate mean of absolute course error
         if boat.history.shape[0] > 0:
             mae = boat.history.course_error.abs().mean()
@@ -101,18 +100,18 @@ class SimDrawer:
         self.write_text("Wind direction: %.1f°" % env.wind_direction, 8)
         self.write_text("Wind speed: %.1f knots" % env.wind_speed, 9)
         self.write_text("MAE: %.1f°" % mae, 11)
-        self.write_text("Strategy: %s" % strategy.get_name(), 12)
+        self.write_text("Strategy: %s" % strategy_name, 12)
 
         textsurface = self._smallfont.render(
             "Press keys to change: 1/2 for target angle, 3/4 for wind direction, 5/6 for wind speed, s to change strategy, q to quit", True, self.TEXT_COLOR)
         self._screen.blit(textsurface, (20, 565))
 
-    def draw(self, boat: Boat, env: Environment, strategy: Base):
+    def draw(self, boat: Boat, env: Environment, strategy_name='Undefined'):
         # redraw objects
         self._screen.fill(self.BG_COLOR)
         self.draw_boat(boat)
         self.draw_env(env)
-        self.draw_stats(boat, env, strategy)
+        self.draw_stats(boat, env, strategy_name)
 
         # display new frame
         pygame.display.flip()

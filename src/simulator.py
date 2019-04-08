@@ -75,7 +75,7 @@ class Simulator:
             self._boat.update()
 
             # redraw objects
-            self._drawer.draw(self._boat, self._env, self._strategy)
+            self._drawer.draw(self._boat, self._env, self._strategy.get_name())
 
             # shuffle once in a while
             if self._shuffle_interval and time.time() > shuffle_time:

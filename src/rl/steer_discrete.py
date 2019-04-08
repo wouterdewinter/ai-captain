@@ -1,6 +1,7 @@
 import numpy as np
 import gym
 import os
+import time
 
 from keras.models import Sequential
 from keras.layers import Dense, Activation, Flatten
@@ -16,7 +17,7 @@ os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 import gym_sail
 
 ENV_NAME = 'sail-v0'
-
+LOAD = True
 
 # Get the environment and extract the number of actions.
 env = gym.make(ENV_NAME)
@@ -45,13 +46,22 @@ dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmu
                target_model_update=1e-2, policy=policy)
 dqn.compile(Adam(lr=1e-4), metrics=['mae'])
 
+# load weights
+model_filename = os.path.join('data', 'models', 'ddpg_%s_%d_weights.h5f')
+if LOAD:
+    dqn.load_weights(model_filename % (ENV_NAME, 1554729826)),  # 15 minutes of training (6h real time)
+    # dqn.load_weights(model_filename % (ENV_NAME, 1554731807)), # 1 hour of training (24h real time)
+
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
 dqn.fit(env, nb_steps=1000000, visualize=False, verbose=2)
 
 # After training is done, we save the final weights.
-dqn.save_weights('dqn_{}_weights.h5f'.format(ENV_NAME), overwrite=True)
+filename = model_filename % (ENV_NAME, time.time())
+dqn.save_weights(filename, overwrite=True)
+print("saved weights to %s" % filename)
+
 
 # Finally, evaluate our algorithm for 5 episodes.
 dqn.test(env, nb_episodes=500, visualize=True)
