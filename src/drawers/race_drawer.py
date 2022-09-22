@@ -1,5 +1,9 @@
 import pygame
+import pandas as pd
+import os.path
+
 from tools import rotate_point
+from environment import Environment
 
 
 class RaceDrawer:
@@ -9,7 +13,7 @@ class RaceDrawer:
     RACE_CANVAS_COLOR = (33, 66, 99)
 
     ARROW_SHAPE = [(0, 100), (0, 200), (200, 200), (200, 300), (300, 150), (200, 0), (200, 100)]
-    ARROW_COLOR = (0, 255, 0)
+    ARROW_COLOR = (9, 209, 97)
     ARROW_POS = [350, 250]
     ARROW_ORIGIN = [150, 100]
     ARROW_SCALE = 0.2
@@ -19,10 +23,25 @@ class RaceDrawer:
     BOAT_COLOR = (255, 255, 255)
     BOAT_SCALE = 0.1
 
-    def __init__(self, screen):
-        self._screen = screen
+    SIZE = 1100, 730
+    BG_COLOR = 0, 0, 0
+    TEXT_COLOR = 255, 255, 255
+
+    def __init__(self, boats: list, env: Environment):
+        self._boats = boats
+        self._env = env
         self._offset = (0, 0)
         self._scale = 0
+
+        pygame.init()
+        pygame.font.init()
+
+        self._font = pygame.font.Font(os.path.join('fonts', 'B612-Regular.ttf'), 20)
+        self._smallfont = pygame.font.Font(os.path.join('fonts', 'B612-Regular.ttf'), 15)
+        self._screen = pygame.display.set_mode(self.SIZE)
+
+        # scale the race canvas
+        self.autoscale(self._env.get_buoys())
 
     def autoscale(self, buoys):
         """ Scale race canvas to fit all buoys """
@@ -98,4 +117,38 @@ class RaceDrawer:
             x, y = self.translate_pos(position)
             pygame.draw.circle(self._screen, self.BUOY_COLOR, (x, y), 5)
 
+    def write_text(self, text, row, color=(255, 255, 255)):
+        pos = 740, 30 + (row * 30)
+        textsurface = self._font.render(text, True, color)
+        self._screen.blit(textsurface, pos)
 
+    def draw(self):
+        self._screen.fill(self.BG_COLOR)
+        self.draw_env(self._env)
+        self.draw_buoys(self._env.get_buoys())
+
+        # draw all boats
+        scoreboard = []
+        for boat in self._boats:
+
+            # update boat and draw
+            self.draw_boat(boat)
+
+            # update scoreboard
+            scoreboard.append({
+                'name': boat.get_name(),
+                'color': boat.get_boat_color(),
+                'marks_passed': boat.get_marks_passed(),
+                'dtw': boat.get_distance_to_waypoint()
+            })
+
+        # show scoreboard
+        scoreboard = pd.DataFrame(scoreboard).sort_values(by=['marks_passed', 'dtw'], ascending=[False, True])
+        i = 0
+        for _, row in scoreboard.iterrows():
+            text = "%s (DTW: %dm)" % (row['name'], row.dtw)
+            self.write_text(text, i, row.color)
+            i += 1
+
+        # display new frame
+        pygame.display.flip()

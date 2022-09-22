@@ -1,5 +1,6 @@
 from strategies.base import Base
 
+
 class Binary(Base):
 
     def update(self):
