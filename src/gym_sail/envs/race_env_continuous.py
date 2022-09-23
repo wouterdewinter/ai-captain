@@ -30,10 +30,13 @@ class RaceEnvContinuous(gym.Env):
 
         self.reset()
         self._step = 0
+        self._last_distance = 0
+        self._last_reward = 0
+        self._last_marks_passed = 0
 
     def render(self, mode='human', close=False):
         obs = self.get_observation()
-        self._drawer.draw(str(round(obs[0], 3)) + " / " + str(round(obs[1], 3)) + " / " + str(round(obs[2], 3)))
+        self._drawer.draw(str(round(obs[0], 3)) + " / " + str(round(obs[1], 3)) + " / " + str(round(obs[2], 3)) + "R: " + str(round(self._last_reward, 2)))
 
         # should we quit?
         for event in pygame.event.get():
@@ -46,6 +49,8 @@ class RaceEnvContinuous(gym.Env):
         return [seed]
 
     def step(self, action):
+        self._last_distance = self._boat.get_distance_to_waypoint()
+
         #assert self.action_space.contains(action)
         rudder_angle = float(action) * 30
         self._boat.set_target_rudder_angle(rudder_angle)
@@ -54,15 +59,40 @@ class RaceEnvContinuous(gym.Env):
         self._env.update()
         self._boat.update()
 
-        mark_reward = self._boat.get_marks_passed() * 100
-        reward = mark_reward - self._boat.get_distance_to_waypoint()
+        #mark_reward = self._boat.get_marks_passed() * 100
+        #reward = mark_reward - self._boat.get_distance_to_waypoint()
+        reward = self._last_distance - self._boat.get_distance_to_waypoint()
 
-        # self._step += 1
+        # make a negative reward count heavier to prevent going in circles
+        if reward < 0:
+            reward *= 3
+
+        self._step += 1
+
+        # limit number of steps
         done = False
-        # if self._step > 300:
-        #     self._step = 0
-        #     done = True
-        #     print("done")q
+        if self._step > 15000:
+            self._step = 0
+            done = True
+            print("done due to max steps")
+
+        # out of bounds
+        if self._boat.get_distance_to_waypoint() > 70:
+            self._step = 0
+            done = True
+            reward = -1000
+            print("done due to max distance")
+
+        if self._boat.get_marks_passed() > self._last_marks_passed:
+            self._last_marks_passed = self._boat.get_marks_passed()
+            print("we rounded a mark!")
+            reward = 1000
+
+        # penalty if we are going too slow
+        if self._boat.speed < 1:
+            reward -= 1
+
+        self._last_reward = reward
 
         return self.get_observation(), reward, done, {"debug": 123}
 

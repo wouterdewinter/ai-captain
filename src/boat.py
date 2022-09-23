@@ -272,6 +272,10 @@ class SimBoat(Boat):
 
     def calculate_speed(self):
         target_speed = self._polar.get_speed(twa=self.get_angle_of_attack(), tws=self._env.wind_speed)
+
+        # add some rudder drag
+        target_speed *= 1-abs(self.rudder_angle)/100
+
         delta = target_speed - self._speed
 
         self._speed += delta * (self.SPEED_CHANGE_RATE / self._draw_fps)
