@@ -2,6 +2,7 @@ name: aicaptain
 channels:
   - cogsci
   - defaults
+  - conda-forge
 dependencies:
   - python=3.6.8
   - pandas=0.23.4
@@ -12,8 +13,10 @@ dependencies:
   - scikit-learn=0.20.2
   - scikit-image=0.14.1
   - keras=2.2.4
+  - stable-baselines3
+#  - gym=0.19.0
   - pip:
     - pygame==1.9.4
     - PyGeodesy==18.10.29
-    - gym==0.10.9
+#    - gym==0.10.9
     - keras-rl==0.4.2

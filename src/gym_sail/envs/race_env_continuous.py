@@ -32,7 +32,8 @@ class RaceEnvContinuous(gym.Env):
         self._step = 0
 
     def render(self, mode='human', close=False):
-        self._drawer.draw()
+        obs = self.get_observation()
+        self._drawer.draw(str(round(obs[0], 3)) + " / " + str(round(obs[1], 3)) + " / " + str(round(obs[2], 3)))
 
         # should we quit?
         for event in pygame.event.get():

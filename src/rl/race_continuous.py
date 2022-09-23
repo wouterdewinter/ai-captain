@@ -69,13 +69,13 @@ if LOAD:
     t = 1548451946
     model_filename = os.path.join('data', 'models', 'ddpg_%s_%d_weights.h5f' % (ENV_NAME, t))
     agent.load_weights(model_filename),
-else:
-    # train
-    agent.fit(env, nb_steps=10000000, visualize=False, verbose=1, nb_max_episode_steps=4000)
 
-    # After training is done, we save the final weights.
-    model_filename = os.path.join('data', 'models', 'ddpg_%s_%d_weights.h5f' % (ENV_NAME, int(time.time())))
-    agent.save_weights(model_filename, overwrite=True)
+# train
+#agent.fit(env, nb_steps=10000000, visualize=False, verbose=0, nb_max_episode_steps=4000)
+
+# After training is done, we save the final weights.
+# model_filename = os.path.join('data', 'models', 'ddpg_%s_%d_weights.h5f' % (ENV_NAME, int(time.time())))
+# agent.save_weights(model_filename, overwrite=True)
 
 # Finally, evaluate our algorithm for 5 episodes.
 agent.test(env, nb_episodes=100, visualize=True, nb_max_episode_steps=4000)
