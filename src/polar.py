@@ -19,8 +19,11 @@ class Polar:
         idx = np.arange(0, 181, 1)
         data = data.reindex(idx)
         # todo: assumption, set speeds outside data from polar
-        data.iloc[0] = 0
-        data.iloc[5] = data.iloc[60] * 0.05
+        # boat going backwards at really small angles
+        data.iloc[0] = -1.5
+        data.iloc[5] = -1
+        # make some assumptions on the edges
+        data.iloc[10] = data.iloc[60] * 0.05
         data.iloc[180] = data.iloc[150] * 0.8
         data.interpolate(method='polynomial', order=2, inplace=True)
 
