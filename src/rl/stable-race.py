@@ -1,15 +1,17 @@
 import gym
 import os
 from stable_baselines3 import A2C, PPO, DDPG, SAC
-from stable_baselines3.common.callbacks import EvalCallback
+from stable_baselines3.common.callbacks import EvalCallback, CallbackList, CheckpointCallback
+from stable_baselines3.common.evaluation import evaluate_policy
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-justin-2'
+RUN_NAME = 'ppo-justin-5'
 TIMESTEPS = 100000000
 #LOAD_FILE = "ppo-1_1380000_weights.zip"  # 270000
-LOAD_FILE = "ppo-justin-2"
-TRAIN = 0
+#LOAD_FILE = "ppo-justin-4"
+LOAD_FILE = ""
+TRAIN = 1
 
 env = gym.make(ENV_NAME)
 
@@ -21,22 +23,27 @@ model = PPO('MlpPolicy', env, verbose=1, gamma=0.95, n_steps=256, ent_coef=0.090
 
 if LOAD_FILE:
     print("loading "+LOAD_FILE)
-    model_filename = os.path.join('data', 'models', LOAD_FILE, 'best_model.zip')
+    model_filename = os.path.join('data', 'models', LOAD_FILE, 'best_model')
     model.load(model_filename, env)
 
 if TRAIN:
     save_path = os.path.join('data', 'models', RUN_NAME)
-    cb = EvalCallback(eval_env=env, render=False, n_eval_episodes=3, eval_freq=100000, best_model_save_path=save_path, log_path=save_path)
-    model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name="PPO", callback=cb)
+    eval_callback = EvalCallback(eval_env=env, render=True, n_eval_episodes=1, eval_freq=50000, best_model_save_path=save_path)
+    checkpoint_callback = CheckpointCallback(save_freq=10000, save_path=save_path)
+    callback = CallbackList([checkpoint_callback, eval_callback])
+
+    model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name="PPO", callback=callback)
     # for i in range(100):
     #     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name="PPO", callback=cb)
     #     model_filename = os.path.join('data', 'models', '%s_%d_weights' % (RUN_NAME, TIMESTEPS * (i + 1)))
     #     model.save(model_filename)
 
-obs = env.reset()
-for i in range(30000):
-    action, _state = model.predict(obs, deterministic=True)
-    obs, reward, done, info = env.step(action)
-    env.render()
-    if done:
-      obs = env.reset()
+evaluate_policy(model, env, render=True, n_eval_episodes=3, deterministic=False)
+
+# obs = env.reset()
+# for i in range(30000):
+#     action, _state = model.predict(obs, deterministic=False)
+#     obs, reward, done, info = env.step(action)
+#     env.render()
+#     if done:
+#       obs = env.reset()
