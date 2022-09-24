@@ -5,10 +5,10 @@ from stable_baselines3.common.callbacks import EvalCallback
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-justin-1'
+RUN_NAME = 'ppo-justin-2'
 TIMESTEPS = 100000000
 #LOAD_FILE = "ppo-1_1380000_weights.zip"  # 270000
-LOAD_FILE = "ppo-justin-1"
+LOAD_FILE = "ppo-justin-2"
 TRAIN = 0
 
 env = gym.make(ENV_NAME)

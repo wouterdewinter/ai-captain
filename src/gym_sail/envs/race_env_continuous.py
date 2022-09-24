@@ -17,7 +17,7 @@ class RaceEnvContinuous(gym.Env):
 
     def __init__(self):
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
-        self.observation_space = spaces.Box(low=-1, high=1, shape=(3,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-1, high=1, shape=(5,), dtype=np.float32)
 
         self.seed()
         self.observation = None
@@ -42,6 +42,8 @@ class RaceEnvContinuous(gym.Env):
             'Delta: ' + str(round(obs[0], 3)),
             'Rudder angle: ' + str(round(obs[1], 3)),
             'Angle of attack: ' + str(round(obs[2], 3)),
+            'Speed: ' + str(round(obs[3], 3)),
+            'DTW: ' + str(round(obs[4], 3)),
             'Reward: ' + str(round(self._last_reward, 2)),
             'Total reward: ' + str(round(self._total_reward, 2)),
             'Last action: %.2f ' % self._last_action,
@@ -102,8 +104,11 @@ class RaceEnvContinuous(gym.Env):
             print("we rounded a mark!")
             reward = 1000
 
+        # give a small award for speed
+        reward += self._boat.speed / 100
+
         # penalty if we are going too slow
-        if self._boat.speed < 1:
+        if self._boat.speed < 2:
             reward -= 1
 
         self._last_reward = reward
@@ -117,7 +122,9 @@ class RaceEnvContinuous(gym.Env):
         return np.array([
             delta / 180,
             self._boat.rudder_angle / 30,
-            self._boat.get_angle_of_attack() / 180
+            self._boat.get_angle_of_attack() / 180,
+            self._boat.speed / 10,
+            self._boat.get_distance_to_waypoint() / 100
         ])
 
     def reset(self):

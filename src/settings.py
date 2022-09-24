@@ -5,7 +5,7 @@ class Settings:
     UPDATE_FPS = 5
 
     # number of graphical frames per second
-    DRAW_FPS = 20
+    DRAW_FPS = 10
 
     # scale the race area
     BUOY_SCALE = 0.05
