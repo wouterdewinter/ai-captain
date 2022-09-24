@@ -16,7 +16,11 @@ from settings import Settings
 class Boat:
     """Base class for simulated and real boats"""
 
-    WEATHER_HELM_FORCE = 0.02
+    # with a straight rudder a sailboat will eventually head straight into the wind
+    # disabled for RL training: WEATHER_HELM_FORCE = 0.02
+    WEATHER_HELM_FORCE = 0
+
+    # amount of boat heel caused by the wind
     BOAT_HEEL_FORCE = 1
 
     # degrees rudder angle can change per second

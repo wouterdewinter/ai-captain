@@ -122,7 +122,7 @@ class RaceDrawer:
         textsurface = self._font.render(text, True, color)
         self._screen.blit(textsurface, pos)
 
-    def draw(self, debug=""):
+    def draw(self, debug_lines=[]):
         self._screen.fill(self.BG_COLOR)
         self.draw_env(self._env)
         self.draw_buoys(self._env.get_buoys())
@@ -150,7 +150,10 @@ class RaceDrawer:
             self.write_text(text, i, row.color)
             i += 1
 
-        self.write_text(debug, 10)
+        # show debug information
+        for line in debug_lines:
+            i += 1
+            self.write_text(line, i)
 
         # display new frame
         pygame.display.flip()
