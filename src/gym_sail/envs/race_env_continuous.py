@@ -77,10 +77,10 @@ class RaceEnvContinuous(gym.Env):
             print("done due to max steps")
 
         # out of bounds
-        if self._boat.get_distance_to_waypoint() > 70:
+        if self._boat.get_distance_to_waypoint() > 80:
             self._step = 0
             done = True
-            reward = -1000
+            reward = -100
             print("done due to max distance")
 
         if self._boat.get_marks_passed() > self._last_marks_passed:
