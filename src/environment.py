@@ -53,3 +53,6 @@ class Environment:
 
     def get_buoys(self):
         return self._buoys
+
+    def set_buoys(self, buoys):
+        self._buoys = buoys

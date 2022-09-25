@@ -6,6 +6,7 @@ import os
 import random
 
 from boat import *
+from buoys import trapezoidal, buoys_noise, buoys_translate
 from environment import Environment
 from polar import Polar
 from drawers.race_drawer import RaceDrawer
@@ -28,13 +29,14 @@ class RaceEnvContinuous(gym.Env):
         self._boat = SimBoat(self._env, polar=polar, keep_log=False).set_waypoint(1)
         self._drawer = RaceDrawer([self._boat], self._env)
 
-        self.reset()
         self._step = 0
         self._last_distance = 0
         self._last_reward = 0
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
+
+        self.reset()
 
     def render(self, mode='human', close=False):
         obs = self.get_observation()
@@ -155,6 +157,10 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
+
+        # generate new course
+        buoys = buoys_translate(buoys_noise(trapezoidal(width=random.uniform(0.04, 0.06))))
+        self._env.set_buoys(buoys)
 
         return self.get_observation()
 
