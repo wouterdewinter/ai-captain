@@ -120,6 +120,7 @@ class Boat:
         """Simulates or fetches movement of boat"""
 
         # steering input (speed dependant)
+        # not taking the absolute speed makes the steering reverse when going backwards
         self.boat_angle -= self.rudder_angle / 10 * self.speed / 5
 
         # apply weather helm
