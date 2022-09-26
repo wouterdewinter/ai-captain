@@ -6,7 +6,7 @@ import os
 import random
 
 from boat import *
-from buoys import trapezoidal, buoys_noise, buoys_translate
+from buoys import trapezoidal, buoys_noise, buoys_translate, random_course
 from environment import Environment
 from polar import Polar
 from drawers.race_drawer import RaceDrawer
@@ -130,10 +130,11 @@ class RaceEnvContinuous(gym.Env):
         #delta = (delta + 180) % 360 - 180
         return np.array(
             list(to_vector(delta)) + list(to_vector(self._boat.get_angle_of_attack())) + [
-            self._boat.rudder_angle / 30,
-            self._boat.speed / 10,
-            self._boat.get_distance_to_waypoint() / 100
-        ])
+                self._boat.rudder_angle / 30,
+                self._boat.speed / 10,
+                self._boat.get_distance_to_waypoint() / 100
+            ]
+        )
 
     # def get_observation(self):
     #     delta = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
@@ -146,6 +147,11 @@ class RaceEnvContinuous(gym.Env):
     #         self._boat.get_distance_to_waypoint() / 100
     #     ])
     def reset(self):
+        # generate new course
+        #buoys = buoys_translate(buoys_noise(trapezoidal(width=random.uniform(0.04, 0.06))))
+        buoys = buoys_translate(random_course())
+        self._env.set_buoys(buoys)
+
         self._boat.reset_rudder()
         self._boat.reset_boat_position()
         self._boat.set_heading(random.randint(-90, 90))
@@ -157,10 +163,6 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
-
-        # generate new course
-        buoys = buoys_translate(buoys_noise(trapezoidal(width=random.uniform(0.04, 0.06))))
-        self._env.set_buoys(buoys)
 
         return self.get_observation()
 

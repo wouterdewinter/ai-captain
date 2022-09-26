@@ -7,15 +7,15 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-multi-2'
+RUN_NAME = 'ppo-5-multi-random'
 TIMESTEPS = 100000000
-LOAD_FILE = 1
-TRAIN = 0
+LOAD_FILE = 0
+TRAIN = 1
 
 tensorboard_log = os.path.join('data', 'logs', 'progress_tensorboard')
 
 eval_env = gym.make(ENV_NAME)
-env = make_vec_env(ENV_NAME, n_envs=4)
+env = make_vec_env(ENV_NAME, n_envs=8)
 
 #model = A2C('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
 model = PPO('MlpPolicy', env, verbose=0, tensorboard_log=tensorboard_log)
@@ -38,7 +38,7 @@ model = PPO('MlpPolicy', env, verbose=0, tensorboard_log=tensorboard_log)
 if LOAD_FILE:
     print("loading from file")
     #model_filename = os.path.join('data', 'models', 'ppo-6', 'best_model')
-    model_filename = os.path.join('data', 'models', 'ppo-multi-2', 'best_model')
+    model_filename = os.path.join('data', 'models', 'ppo-4-multi-random', 'best_model')
     model = model.load(model_filename, env, tensorboard_log=tensorboard_log)
 
 if TRAIN:
