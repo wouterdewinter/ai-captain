@@ -3,12 +3,14 @@ import gym
 import gym_sail
 from stable_baselines3.common.env_checker import check_env
 
-env = gym.make('race-continuous-v0')
+env = gym.make('race-continuous-v0', record=True)
 
-check_env(env, skip_render_check=False);
+check_env(env, skip_render_check=False)
 
-for i_episode in range(10):
+
+for i_episode in range(1):
     env.reset()
+
     for t in range(10000):
         env.render()
         action = 0
@@ -27,4 +29,3 @@ for i_episode in range(10):
         if done:
             print("Episode finished after {} timesteps, {}".format(t+1, info))
             break
-

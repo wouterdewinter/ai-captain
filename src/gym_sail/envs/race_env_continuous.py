@@ -1,3 +1,5 @@
+from time import time
+
 import gym
 from gym import error, spaces, utils
 from gym.utils import seeding
@@ -10,13 +12,14 @@ from buoys import trapezoidal, buoys_noise, buoys_translate, random_course
 from environment import Environment
 from polar import Polar
 from drawers.race_drawer import RaceDrawer
+from screen_recorder import ScreenRecorder
 from settings import Settings
 
 
 class RaceEnvContinuous(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self):
+    def __init__(self, record=False):
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
         self.observation_space = spaces.Box(low=-1, high=1, shape=(7,), dtype=np.float32)
 
@@ -35,6 +38,8 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
+
+        self._record = record
 
         self.reset()
 
@@ -123,6 +128,10 @@ class RaceEnvContinuous(gym.Env):
         self._last_reward = reward
         self._total_reward += reward
 
+        # end recording if enabled
+        if done and self._record:
+            self._drawer.recorder.end_recording()
+
         return self.get_observation(), reward, done, {"total_reward": self._total_reward}
 
     def get_observation(self):
@@ -163,6 +172,11 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
+
+        # start recording if enabled
+        if self._record:
+            recorder = ScreenRecorder(1100, 730, 20, f'{int(time())}.avi')
+            self._drawer.recorder = recorder
 
         return self.get_observation()
 

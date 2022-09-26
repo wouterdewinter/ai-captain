@@ -7,10 +7,10 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-5-multi-random'
+RUN_NAME = 'ppo-5-random-course'
 TIMESTEPS = 100000000
-LOAD_FILE = 0
-TRAIN = 1
+LOAD_FILE = 1
+TRAIN = 0
 
 tensorboard_log = os.path.join('data', 'logs', 'progress_tensorboard')
 
@@ -38,12 +38,12 @@ model = PPO('MlpPolicy', env, verbose=0, tensorboard_log=tensorboard_log)
 if LOAD_FILE:
     print("loading from file")
     #model_filename = os.path.join('data', 'models', 'ppo-6', 'best_model')
-    model_filename = os.path.join('data', 'models', 'ppo-4-multi-random', 'best_model')
+    model_filename = os.path.join('data', 'models', 'ppo-5-random-course', 'best_model')
     model = model.load(model_filename, env, tensorboard_log=tensorboard_log)
 
 if TRAIN:
     save_path = os.path.join('data', 'models', RUN_NAME)
-    eval_callback = EvalCallback(eval_env=eval_env, render=True, n_eval_episodes=1, eval_freq=100000, best_model_save_path=save_path)
+    eval_callback = EvalCallback(eval_env=eval_env, render=True, n_eval_episodes=1, eval_freq=20000, best_model_save_path=save_path)
     checkpoint_callback = CheckpointCallback(save_freq=50000, save_path=save_path)
     callback = CallbackList([checkpoint_callback, eval_callback])
 

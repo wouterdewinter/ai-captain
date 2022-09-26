@@ -43,6 +43,8 @@ class RaceDrawer:
         # scale the race canvas
         self.autoscale(self._env.get_buoys())
 
+        self.recorder = None
+
     def autoscale(self, buoys):
         """ Scale race canvas to fit all buoys """
         lat, lon = zip(*buoys)
@@ -156,6 +158,10 @@ class RaceDrawer:
         for line in debug_lines:
             i += 1
             self.write_text(line, i)
+
+        # record frame if recorder is present
+        if self.recorder:
+            self.recorder.capture_frame(self._screen)
 
         # display new frame
         pygame.display.flip()
