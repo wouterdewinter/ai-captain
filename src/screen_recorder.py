@@ -5,6 +5,7 @@ import pygame
 class ScreenRecorder:
     """
         This class is used to record a PyGame surface and save it to a video file.
+        From: https://github.com/tdrmk/pygame_recorder
     """
 
     def __init__(self, width, height, fps, out_file='output.avi'):
@@ -16,10 +17,10 @@ class ScreenRecorder:
         :param out_file: Output file to save the recording
         """
         print(f'Initializing ScreenRecorder with parameters width:{width} height:{height} fps:{fps}.')
-        print(f'Output of the screen recording saved to {out_file}.')
+        print(f'Output of the screen recording will be saved to {out_file}.')
 
         # define the codec and create a video writer object
-        four_cc = cv2.VideoWriter_fourcc(*'XVID')
+        four_cc = cv2.VideoWriter_fourcc(*'mp4v')
         self.video = cv2.VideoWriter(out_file, four_cc, float(fps), (width, height))
 
     def capture_frame(self, surf):
