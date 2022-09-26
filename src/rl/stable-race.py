@@ -7,14 +7,14 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-5-random-course'
+RUN_NAME = 'ppo-6-video'
 TIMESTEPS = 100000000
-LOAD_FILE = 1
-TRAIN = 0
+LOAD_FILE = 0
+TRAIN = 1
 
 tensorboard_log = os.path.join('data', 'logs', 'progress_tensorboard')
 
-eval_env = gym.make(ENV_NAME)
+eval_env = gym.make(ENV_NAME, recording_path=os.path.join('data', 'models', RUN_NAME))
 env = make_vec_env(ENV_NAME, n_envs=8)
 
 #model = A2C('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
