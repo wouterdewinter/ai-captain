@@ -113,9 +113,11 @@ class RaceDrawer:
         pygame.draw.polygon(self._screen, self.BOAT_COLOR, vectors, 1)
 
     def draw_buoys(self, buoys):
-        for position in buoys:
+        for i, position in enumerate(buoys):
             x, y = self.translate_pos(position)
             pygame.draw.circle(self._screen, self.BUOY_COLOR, (x, y), 5)
+            txt = self._smallfont.render(str(i+1), True, (255, 255, 255))
+            self._screen.blit(txt, (x-5, y+8))
 
     def write_text(self, text, row, color=(255, 255, 255)):
         pos = 740, 30 + (row * 30)
