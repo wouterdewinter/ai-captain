@@ -7,7 +7,7 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-6-video'
+RUN_NAME = 'ppo-7-video'
 TIMESTEPS = 100000000
 LOAD_FILE = 0
 TRAIN = 1

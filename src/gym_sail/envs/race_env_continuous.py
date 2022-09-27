@@ -14,7 +14,7 @@ from polar import Polar
 from drawers.race_drawer import RaceDrawer
 from screen_recorder import ScreenRecorder
 from settings import Settings
-
+from pathlib import Path
 
 class RaceEnvContinuous(gym.Env):
     metadata = {'render.modes': ['human']}
@@ -39,7 +39,10 @@ class RaceEnvContinuous(gym.Env):
         self._last_marks_passed = 0
         self._last_action = 0
 
+        # check if recording path exists
         self._recording_path = recording_path
+        if recording_path:
+            Path(recording_path).mkdir(parents=True, exist_ok=True)
 
         self.reset()
 
@@ -131,6 +134,7 @@ class RaceEnvContinuous(gym.Env):
         # end recording if enabled
         if done and self._recording_path:
             self._drawer.recorder.end_recording()
+            self._drawer.recorder = None
 
         return self.get_observation(), reward, done, {"total_reward": self._total_reward}
 
@@ -173,8 +177,8 @@ class RaceEnvContinuous(gym.Env):
         self._last_marks_passed = 0
         self._last_action = 0
 
-        # start recording if enabled
-        if self._recording_path:
+        # start recording if enabled and not yet started
+        if self._recording_path and not self._drawer.recorder:
             recorder = ScreenRecorder(1100, 730, 20, os.path.join(self._recording_path, f'{int(time())}.mp4'))
             self._drawer.recorder = recorder
 
