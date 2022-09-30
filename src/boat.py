@@ -67,7 +67,7 @@ class Boat:
 
     def reset_boat_position(self):
         # add some noise to the longitude to simulate a start line
-        self._position = (52.3721693, 5.0750607 + random.uniform(-0.0001, 0.0001))
+        self._position = (52.3721693, 5.0750607 + random.uniform(-0.0002, 0.0002))
 
     def set_heading(self, heading):
         self.boat_angle = heading
@@ -264,6 +264,9 @@ class Boat:
 
     def set_draw_fps(self, fps):
         self._draw_fps = fps
+
+    def get_distance_to_boat(self, boat: "Boat"):
+        return geo.haversine(self._position[0], self._position[1], boat._position[0], boat._position[1])
 
 
 class SimBoat(Boat):

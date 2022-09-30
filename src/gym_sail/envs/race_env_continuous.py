@@ -22,9 +22,9 @@ from strategies.default import Proportional
 class RaceEnvContinuous(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, recording_path="", create_extra_boats_num=5):
+    def __init__(self, recording_path="", create_extra_boats_num=3):
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
-        self.observation_space = spaces.Box(low=-1, high=1, shape=(7,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-1, high=1, shape=(8,), dtype=np.float32)
 
         self.seed()
         self.observation = None
@@ -51,6 +51,7 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
+        self._last_nearest_distance = 1
 
         # check if recording path exists
         self._recording_path = recording_path
@@ -69,6 +70,7 @@ class RaceEnvContinuous(gym.Env):
             'Rudder angle: ' + str(round(obs[4], 3)),
             'Speed: ' + str(round(obs[5], 3)),
             'DTW: ' + str(round(obs[6], 3)),
+            'Nearest distance: ' + str(round(obs[7], 3)),
             'Reward: ' + str(round(self._last_reward, 2)),
             'Total reward: ' + str(round(self._total_reward, 2)),
             'Last action: %.2f ' % self._last_action,
@@ -107,6 +109,23 @@ class RaceEnvContinuous(gym.Env):
         # base reward is the distance covered towards the mark
         reward = self._last_distance - self._boat.get_distance_to_waypoint()
 
+        # check other boats
+        nearby_boats = []
+        for boat in self._extra_boats:
+            distance = self._boat.get_distance_to_boat(boat)
+            if distance < 5:
+                nearby_boats.append((distance, boat))
+
+        nearby_boats.sort(key=lambda x: x[0])
+
+        print(len(nearby_boats), "nearby boats")
+        for (distance, boat) in nearby_boats:
+            print("distance", self._boat.get_distance_to_boat(boat))
+
+        self._last_nearest_distance = 1
+        if len(nearby_boats) > 0:
+            self._last_nearest_distance = nearby_boats[0][0] / 5
+
         # after a reset of the last distance, prevent giving a negative reward
         if self._last_distance == 0:
             reward = 0
@@ -120,6 +139,12 @@ class RaceEnvContinuous(gym.Env):
         if self._step > 5000:
             done = True
             print("done due to max steps")
+
+        # negative reward for hitting another boat
+        if self._last_nearest_distance < 0.1:
+            done = True
+            reward = -100
+            print("hit another boat")
 
         # check out of bounds
         if self._boat.get_distance_to_waypoint() > 80:
@@ -156,7 +181,8 @@ class RaceEnvContinuous(gym.Env):
             list(to_vector(delta)) + list(to_vector(self._boat.get_angle_of_attack())) + [
                 self._boat.rudder_angle / 30,
                 self._boat.speed / 10,
-                self._boat.get_distance_to_waypoint() / 100
+                self._boat.get_distance_to_waypoint() / 100,
+                self._last_nearest_distance
             ]
         )
 
@@ -185,6 +211,7 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
+        self._last_nearest_distance = 1
 
         # start recording if enabled and not yet started
         if self._recording_path and not self._drawer.recorder:
