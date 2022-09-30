@@ -1,3 +1,4 @@
+import random
 from threading import Thread
 import pygame
 import numpy as np
@@ -65,7 +66,8 @@ class Boat:
         self.reset_boat_position()
 
     def reset_boat_position(self):
-        self._position = (52.3721693, 5.0750607)
+        # add some noise to the longitude to simulate a start line
+        self._position = (52.3721693, 5.0750607 + random.uniform(-0.0001, 0.0001))
 
     def set_heading(self, heading):
         self.boat_angle = heading

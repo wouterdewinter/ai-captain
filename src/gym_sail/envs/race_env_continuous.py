@@ -62,11 +62,6 @@ class RaceEnvContinuous(gym.Env):
     def render(self, mode='human', close=False):
         obs = self.get_observation()
         debug = [
-            # 'Delta: ' + str(round(obs[0], 3)),
-            # 'Rudder angle: ' + str(round(obs[1], 3)),
-            # 'Angle of attack: ' + str(round(obs[2], 3)),
-            # 'Speed: ' + str(round(obs[3], 3)),
-            # 'DTW: ' + str(round(obs[4], 3)),
             'Delta x: ' + str(round(obs[0], 3)),
             'Delta y: ' + str(round(obs[1], 3)),
             'Angle of attack x: ' + str(round(obs[2], 3)),
@@ -96,7 +91,7 @@ class RaceEnvContinuous(gym.Env):
         self._last_action = action
         self._step += 1
 
-        #assert self.action_space.contains(action)
+        # perform action on the boat
         rudder_angle = float(action) * 30
         self._boat.set_target_rudder_angle(rudder_angle)
 
@@ -109,8 +104,7 @@ class RaceEnvContinuous(gym.Env):
             strategy.get_boat().update()
             strategy.update()
 
-        #mark_reward = self._boat.get_marks_passed() * 100
-        #reward = mark_reward - self._boat.get_distance_to_waypoint()
+        # base reward is the distance covered towards the mark
         reward = self._last_distance - self._boat.get_distance_to_waypoint()
 
         # after a reset of the last distance, prevent giving a negative reward
@@ -127,7 +121,7 @@ class RaceEnvContinuous(gym.Env):
             done = True
             print("done due to max steps")
 
-        # out of bounds
+        # check out of bounds
         if self._boat.get_distance_to_waypoint() > 80:
             done = True
             reward = -100
@@ -149,7 +143,7 @@ class RaceEnvContinuous(gym.Env):
         self._last_reward = reward
         self._total_reward += reward
 
-        # end recording if enabled
+        # end recording if enabled and we're done
         if done and self._recording_path:
             self._drawer.recorder.end_recording()
             self._drawer.recorder = None
@@ -158,7 +152,6 @@ class RaceEnvContinuous(gym.Env):
 
     def get_observation(self):
         delta = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
-        #delta = (delta + 180) % 360 - 180
         return np.array(
             list(to_vector(delta)) + list(to_vector(self._boat.get_angle_of_attack())) + [
                 self._boat.rudder_angle / 30,
@@ -167,22 +160,13 @@ class RaceEnvContinuous(gym.Env):
             ]
         )
 
-    # def get_observation(self):
-    #     delta = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
-    #     delta = (delta + 180) % 360 - 180
-    #     return np.array([
-    #         delta / 180,
-    #         self._boat.rudder_angle / 30,
-    #         self._boat.get_angle_of_attack() / 180,
-    #         self._boat.speed / 10,
-    #         self._boat.get_distance_to_waypoint() / 100
-    #     ])
     def reset(self):
         # generate new course
         #buoys = buoys_translate(buoys_noise(trapezoidal(width=random.uniform(0.04, 0.06))))
         buoys = buoys_translate(random_course())
         self._env.set_buoys(buoys)
 
+        # reset boat
         self._boat.reset_rudder()
         self._boat.reset_boat_position()
         self._boat.set_heading(random.randint(-90, 90))
