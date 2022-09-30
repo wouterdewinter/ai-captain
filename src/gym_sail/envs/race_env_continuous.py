@@ -6,6 +6,7 @@ from gym.utils import seeding
 import numpy as np
 import os
 import random
+import pygame
 
 from boat import *
 from buoys import trapezoidal, buoys_noise, buoys_translate, random_course
@@ -24,7 +25,7 @@ class RaceEnvContinuous(gym.Env):
 
     def __init__(self, recording_path="", create_extra_boats_num=3):
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
-        self.observation_space = spaces.Box(low=-1, high=1, shape=(8,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-1, high=1, shape=(9,), dtype=np.float32)
 
         self.seed()
         self.observation = None
@@ -51,7 +52,7 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
-        self._last_nearest_distance = 1
+        self._nearby_boats = []
 
         # check if recording path exists
         self._recording_path = recording_path
@@ -70,7 +71,8 @@ class RaceEnvContinuous(gym.Env):
             'Rudder angle: ' + str(round(obs[4], 3)),
             'Speed: ' + str(round(obs[5], 3)),
             'DTW: ' + str(round(obs[6], 3)),
-            'Nearest distance: ' + str(round(obs[7], 3)),
+            'Nearest distance x: ' + str(round(obs[7], 3)),
+            'Nearest distance y: ' + str(round(obs[8], 3)),
             'Reward: ' + str(round(self._last_reward, 2)),
             'Total reward: ' + str(round(self._total_reward, 2)),
             'Last action: %.2f ' % self._last_action,
@@ -106,25 +108,11 @@ class RaceEnvContinuous(gym.Env):
             strategy.get_boat().update()
             strategy.update()
 
+        # create a new observation
+        observation = self.get_observation()
+
         # base reward is the distance covered towards the mark
         reward = self._last_distance - self._boat.get_distance_to_waypoint()
-
-        # check other boats
-        nearby_boats = []
-        for boat in self._extra_boats:
-            distance = self._boat.get_distance_to_boat(boat)
-            if distance < 5:
-                nearby_boats.append((distance, boat))
-
-        nearby_boats.sort(key=lambda x: x[0])
-
-        print(len(nearby_boats), "nearby boats")
-        for (distance, boat) in nearby_boats:
-            print("distance", self._boat.get_distance_to_boat(boat))
-
-        self._last_nearest_distance = 1
-        if len(nearby_boats) > 0:
-            self._last_nearest_distance = nearby_boats[0][0] / 5
 
         # after a reset of the last distance, prevent giving a negative reward
         if self._last_distance == 0:
@@ -141,10 +129,11 @@ class RaceEnvContinuous(gym.Env):
             print("done due to max steps")
 
         # negative reward for hitting another boat
-        if self._last_nearest_distance < 0.1:
-            done = True
-            reward = -100
-            print("hit another boat")
+        if len(self._nearby_boats) > 0:
+            if self._nearby_boats[0][0] < 0.5:
+                done = True
+                reward = -100
+                print("hit another boat")
 
         # check out of bounds
         if self._boat.get_distance_to_waypoint() > 80:
@@ -173,16 +162,34 @@ class RaceEnvContinuous(gym.Env):
             self._drawer.recorder.end_recording()
             self._drawer.recorder = None
 
-        return self.get_observation(), reward, done, {"total_reward": self._total_reward}
+        return observation, reward, done, {"total_reward": self._total_reward}
 
     def get_observation(self):
+        # check other boats
+        self._nearby_boats = []
+        for boat in self._extra_boats:
+            distance = self._boat.get_distance_to_boat(boat)
+            if distance < 5:
+                self._nearby_boats.append((distance, boat))
+
+        # sort on distance and take distance from the nearest boat
+        distance_x = 1
+        distance_y = 1
+        self._nearby_boats.sort(key=lambda x: x[0])
+        if len(self._nearby_boats) > 0:
+            pos1 = self._boat.get_position()
+            pos2 = self._nearby_boats[0][1].get_position()
+            distance_x = abs(pos1[0] - pos2[0]) * 120000 / 5
+            distance_y = abs(pos1[1] - pos2[1]) * 120000 / 5
+
         delta = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
         return np.array(
             list(to_vector(delta)) + list(to_vector(self._boat.get_angle_of_attack())) + [
                 self._boat.rudder_angle / 30,
                 self._boat.speed / 10,
                 self._boat.get_distance_to_waypoint() / 100,
-                self._last_nearest_distance
+                distance_x,
+                distance_y
             ]
         )
 
@@ -211,11 +218,11 @@ class RaceEnvContinuous(gym.Env):
         self._total_reward = 0
         self._last_marks_passed = 0
         self._last_action = 0
-        self._last_nearest_distance = 1
+        self._nearby_boats = []
 
         # start recording if enabled and not yet started
         if self._recording_path and not self._drawer.recorder:
-            recorder = ScreenRecorder(1100, 730, 20, os.path.join(self._recording_path, f'{int(time())}.mp4'))
+            recorder = ScreenRecorder(1100, 730, 30, os.path.join(self._recording_path, f'{int(time())}.mp4'))
             self._drawer.recorder = recorder
 
         return self.get_observation()

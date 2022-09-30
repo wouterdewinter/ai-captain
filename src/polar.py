@@ -38,12 +38,15 @@ class Polar:
         tws = max(tws, 0)
 
         series = self._data.iloc[twa]
-        # todo: assumption, extend to 0 knots TWS by setting to 0
-        series[0] = 0
-        # todo: assumption, extend to 25 knots by adding fixed percentage
-        series[25] = series[20] * 1.005
-        idx = np.arange(0, 26, 1)
-        series = series.reindex(idx).interpolate(method='polynomial', order=2)
+        # todo always return 20 knots to speedup calculations
+        return series[20]
 
-        # return speed
-        return series[tws]
+        # # todo: assumption, extend to 0 knots TWS by setting to 0
+        # series[0] = 0
+        # # todo: assumption, extend to 25 knots by adding fixed percentage
+        # series[25] = series[20] * 1.005
+        # idx = np.arange(0, 26, 1)
+        # series = series.reindex(idx).interpolate(method='polynomial', order=2)
+        #
+        # # return speed
+        # return series[tws]

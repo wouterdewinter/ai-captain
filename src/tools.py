@@ -1,3 +1,4 @@
+import math
 from math import sin, cos, radians
 
 
@@ -28,7 +29,15 @@ def add_vector(a, b):
 
 
 def calc_angle(a1, a2):
-    """ Calculate shortest angle between two angles """
+    """ Calculate the shortest angle between two angles """
     value = a1 - a2
     value = (value + 180) % 360 - 180
     return value
+
+
+def distance(x1, y1, x2, y2):
+    """ Compute rough distance between two vectors in meters """
+    # return math.dist((x1, y1), (x2, y2)) * 120000
+    return math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2) * 120000
+    # return math.hypot(x2 - x1, y2 - y1)
+

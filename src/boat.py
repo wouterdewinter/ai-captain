@@ -1,6 +1,5 @@
 import random
 from threading import Thread
-import pygame
 import numpy as np
 from math import sin, cos, radians
 from random import uniform, randint
@@ -9,9 +8,13 @@ import pandas as pd
 from pygeodesy import formy as geo
 import logging
 
-from tools import rotate_point, add_vector, rotate_vectors, calc_angle
+from tools import calc_angle
 from autopilot.ai_captain_utils import PilotControl
 from settings import Settings
+
+# using a rough estimation of the distance to speed up calculations for learning
+#from pygeodesy.formy import haversine as distance_function
+from tools import distance as distance_function
 
 
 class Boat:
@@ -201,11 +204,11 @@ class Boat:
         upwind_twa = self._strategy.get_upwind_twa()
         downwind_twa = self._strategy.get_downwind_twa()
 
-        # do need to steer an upwind course?
+        # do we need to steer an upwind course?
         if abs(new_twa) < upwind_twa:
             self.set_twa(upwind_twa, tack=self._strategy.need_to_tack())
 
-        # do need to steer an downwind course?
+        # do we need to steer a downwind course?
         elif abs(new_twa) > downwind_twa:
             self.set_twa(downwind_twa, tack=self._strategy.need_to_gybe())
 
@@ -252,7 +255,7 @@ class Boat:
     def get_distance_to_waypoint(self):
         buoys = self._env.get_buoys()
         target_pos = buoys[self._waypoint]
-        return geo.haversine(self._position[0], self._position[1], target_pos[0], target_pos[1])
+        return distance_function(self._position[0], self._position[1], target_pos[0], target_pos[1])
 
     def get_bearing_to_waypoint(self):
         buoys = self._env.get_buoys()
@@ -266,7 +269,7 @@ class Boat:
         self._draw_fps = fps
 
     def get_distance_to_boat(self, boat: "Boat"):
-        return geo.haversine(self._position[0], self._position[1], boat._position[0], boat._position[1])
+        return distance_function(self._position[0], self._position[1], boat._position[0], boat._position[1])
 
 
 class SimBoat(Boat):

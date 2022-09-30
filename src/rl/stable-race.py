@@ -7,7 +7,7 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-7-video'
+RUN_NAME = 'ppo-10-extra-boats'
 TIMESTEPS = 100000000
 LOAD_FILE = 0
 TRAIN = 1
@@ -18,7 +18,7 @@ eval_env = gym.make(ENV_NAME, recording_path=os.path.join('data', 'models', RUN_
 env = make_vec_env(ENV_NAME, n_envs=8)
 
 #model = A2C('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
-model = PPO('MlpPolicy', env, verbose=0, tensorboard_log=tensorboard_log)
+model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
 # model = PPO('MlpPolicy',
 #             env,
 #             verbose=0,
@@ -43,7 +43,7 @@ if LOAD_FILE:
 
 if TRAIN:
     save_path = os.path.join('data', 'models', RUN_NAME)
-    eval_callback = EvalCallback(eval_env=eval_env, render=True, n_eval_episodes=1, eval_freq=20000, best_model_save_path=save_path)
+    eval_callback = EvalCallback(eval_env=eval_env, render=True, n_eval_episodes=1, eval_freq=50000, best_model_save_path=save_path)
     checkpoint_callback = CheckpointCallback(save_freq=50000, save_path=save_path)
     callback = CallbackList([checkpoint_callback, eval_callback])
 
