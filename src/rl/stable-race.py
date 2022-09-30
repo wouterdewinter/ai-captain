@@ -7,7 +7,7 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-10-extra-boats'
+RUN_NAME = 'ppo-11-extra-boat-vector'
 TIMESTEPS = 100000000
 LOAD_FILE = 0
 TRAIN = 1

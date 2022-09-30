@@ -177,10 +177,10 @@ class RaceEnvContinuous(gym.Env):
         distance_y = 1
         self._nearby_boats.sort(key=lambda x: x[0])
         if len(self._nearby_boats) > 0:
-            pos1 = self._boat.get_position()
-            pos2 = self._nearby_boats[0][1].get_position()
-            distance_x = abs(pos1[0] - pos2[0]) * 120000 / 5
-            distance_y = abs(pos1[1] - pos2[1]) * 120000 / 5
+            rel_bearing = self._boat.get_heading() - self._boat.get_bearing_to_boat(self._nearby_boats[0][1])
+            vector = to_vector(rel_bearing)
+            distance_x = vector[0] * self._nearby_boats[0][0] / 5
+            distance_y = vector[1] * self._nearby_boats[0][0] / 5
 
         delta = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
         return np.array(

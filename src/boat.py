@@ -13,8 +13,8 @@ from autopilot.ai_captain_utils import PilotControl
 from settings import Settings
 
 # using a rough estimation of the distance to speed up calculations for learning
-#from pygeodesy.formy import haversine as distance_function
-from tools import distance as distance_function
+from pygeodesy.formy import haversine as distance_function
+#from tools import distance as distance_function
 
 
 class Boat:
@@ -270,6 +270,9 @@ class Boat:
 
     def get_distance_to_boat(self, boat: "Boat"):
         return distance_function(self._position[0], self._position[1], boat._position[0], boat._position[1])
+
+    def get_bearing_to_boat(self, boat: "Boat"):
+        return geo.bearing(self._position[0], self._position[1], boat._position[0], boat._position[1])
 
 
 class SimBoat(Boat):
