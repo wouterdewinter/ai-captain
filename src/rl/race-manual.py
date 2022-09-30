@@ -7,14 +7,27 @@ env = gym.make('race-continuous-v0', recording_path=".")
 
 check_env(env, skip_render_check=False)
 
+joy = None
+joystick_count = pygame.joystick.get_count()
+if joystick_count > 0:
+    joy = pygame.joystick.Joystick(0)
+    joy.init()
+    print(f"Found joystick {joy.get_name()} with {joy.get_numaxes()} axis")
 
 for i_episode in range(1):
     env.reset()
 
     for t in range(10000):
         env.render()
+
+        # default no action
         action = 0
 
+        # get input from joystick
+        if joy:
+            action = -joy.get_axis(0)
+
+        # get input from keyboard
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_LEFT]:
             action = 1

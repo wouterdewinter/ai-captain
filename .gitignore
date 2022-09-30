@@ -2,6 +2,7 @@ __pycache__
 notebooks/.ipynb_checkpoints
 data/logs
 data/datasets
+data/models
 config.py
 notebooks/tools/.ipynb_checkpoints
 src/user_strategies
