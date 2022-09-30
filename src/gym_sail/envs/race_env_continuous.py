@@ -16,10 +16,13 @@ from screen_recorder import ScreenRecorder
 from settings import Settings
 from pathlib import Path
 
+from strategies.default import Proportional
+
+
 class RaceEnvContinuous(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, recording_path=""):
+    def __init__(self, recording_path="", create_extra_boats_num=5):
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
         self.observation_space = spaces.Box(low=-1, high=1, shape=(7,), dtype=np.float32)
 
@@ -30,7 +33,17 @@ class RaceEnvContinuous(gym.Env):
         polar = Polar(os.path.join('data', 'polars', 'first-27.csv'))
         self._env = Environment(buoys=Settings.BUOYS)
         self._boat = SimBoat(self._env, polar=polar, keep_log=False).set_waypoint(1)
-        self._drawer = RaceDrawer([self._boat], self._env)
+
+        # create some more boats
+        self._extra_strategies = []
+        self._extra_boats = []
+        for i in range(create_extra_boats_num):
+            new_boat = SimBoat(self._env, polar=polar, keep_log=False, random_color=True).set_waypoint(1)
+            new_strategy = Proportional(new_boat, self._env)
+            self._extra_strategies.append(new_strategy)
+            self._extra_boats.append(new_boat)
+
+        self._drawer = RaceDrawer([self._boat] + self._extra_boats, self._env)
 
         self._step = 0
         self._last_distance = 0
@@ -90,6 +103,11 @@ class RaceEnvContinuous(gym.Env):
         # update boat and environment
         self._env.update()
         self._boat.update()
+
+        # update extra boats and strategies
+        for strategy in self._extra_strategies:
+            strategy.get_boat().update()
+            strategy.update()
 
         #mark_reward = self._boat.get_marks_passed() * 100
         #reward = mark_reward - self._boat.get_distance_to_waypoint()
@@ -169,6 +187,13 @@ class RaceEnvContinuous(gym.Env):
         self._boat.reset_boat_position()
         self._boat.set_heading(random.randint(-90, 90))
         self._boat.set_waypoint(1)
+
+        # reset extra boats
+        for boat in self._extra_boats:
+            boat.reset_rudder()
+            boat.reset_boat_position()
+            boat.set_heading(random.randint(-90, 90))
+            boat.set_waypoint(1)
 
         self._step = 0
         self._last_distance = 0

@@ -186,7 +186,6 @@ class Boat:
 
     def nav(self):
         """ Update navigation variables and determine new course """
-
         if self._waypoint is None:
             return
 
