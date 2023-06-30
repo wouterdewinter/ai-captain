@@ -3,7 +3,7 @@ import gym
 import gym_sail
 from stable_baselines3.common.env_checker import check_env
 
-env = gym.make('race-continuous-v0', recording_path=".")
+env = gym.make('race-continuous-v0', recording_path="data/video")
 
 check_env(env, skip_render_check=False)
 

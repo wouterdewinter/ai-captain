@@ -1,8 +1,10 @@
 __pycache__
+.idea
 notebooks/.ipynb_checkpoints
 data/logs
 data/datasets
 data/models
+data/video
 config.py
 notebooks/tools/.ipynb_checkpoints
 src/user_strategies

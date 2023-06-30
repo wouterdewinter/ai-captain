@@ -24,11 +24,11 @@ class Environment:
         self.unwrapped_wind_direction = self.main_wind_direction
 
     def update(self):
-        pressed = pygame.key.get_pressed()
-        if pressed[pygame.K_1]:
-            self.main_wind_direction += 1
-        elif pressed[pygame.K_2]:
-            self.main_wind_direction -= 1
+        # pressed = pygame.key.get_pressed()
+        # if pressed[pygame.K_1]:
+        #     self.main_wind_direction += 1
+        # elif pressed[pygame.K_2]:
+        #     self.main_wind_direction -= 1
 
         # update wind speed
         self.wind_speed += (random() - 0.5) * 2

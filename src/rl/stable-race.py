@@ -7,18 +7,22 @@ from stable_baselines3.common.env_util import make_vec_env
 import gym_sail
 
 ENV_NAME = 'race-continuous-v0'
-RUN_NAME = 'ppo-11-extra-boat-vector'
-TIMESTEPS = 100000000
+RUN_NAME = 'ppo-27-mac-m2'
+TIMESTEPS = 20000000
 LOAD_FILE = 0
 TRAIN = 1
 
+# start tensorboard in the terminal with: tensorboard --logdir=data/logs/progress_tensorboard
 tensorboard_log = os.path.join('data', 'logs', 'progress_tensorboard')
 
-eval_env = gym.make(ENV_NAME, recording_path=os.path.join('data', 'models', RUN_NAME))
+eval_env = gym.make(ENV_NAME, recording_path=os.path.join('data', 'models', RUN_NAME), create_extra_boats_num=3)
 env = make_vec_env(ENV_NAME, n_envs=8)
 
 #model = A2C('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
-model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
+policy_kwargs = dict(net_arch=[256, 256])
+# n_steps=8192?
+#model = PPO('MlpPolicy', env, verbose=0, batch_size=256, learning_rate=lambda x: 3e-4 * 4 * x, tensorboard_log=tensorboard_log, policy_kwargs=policy_kwargs)
+model = PPO('MlpPolicy', env, verbose=0, learning_rate=lambda x: 3e-4 * 2 * x, tensorboard_log=tensorboard_log)
 # model = PPO('MlpPolicy',
 #             env,
 #             verbose=0,
@@ -38,16 +42,14 @@ model = PPO('MlpPolicy', env, verbose=1, tensorboard_log=tensorboard_log)
 if LOAD_FILE:
     print("loading from file")
     #model_filename = os.path.join('data', 'models', 'ppo-6', 'best_model')
-    model_filename = os.path.join('data', 'models', 'ppo-5-random-course', 'best_model')
+    model_filename = os.path.join('data', 'models', 'ppo-17-polar', 'best_model')
     model = model.load(model_filename, env, tensorboard_log=tensorboard_log)
 
 if TRAIN:
     save_path = os.path.join('data', 'models', RUN_NAME)
-    eval_callback = EvalCallback(eval_env=eval_env, render=True, n_eval_episodes=1, eval_freq=50000, best_model_save_path=save_path)
-    checkpoint_callback = CheckpointCallback(save_freq=50000, save_path=save_path)
+    eval_callback = EvalCallback(eval_env=eval_env, render=True, n_eval_episodes=3, eval_freq=200000, best_model_save_path=save_path)
+    checkpoint_callback = CheckpointCallback(save_freq=200000, save_path=save_path)
     callback = CallbackList([checkpoint_callback, eval_callback])
-
     model.learn(total_timesteps=TIMESTEPS, reset_num_timesteps=False, tb_log_name=RUN_NAME, callback=callback)
 
 evaluate_policy(model, eval_env, render=True, n_eval_episodes=3)
-

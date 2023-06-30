@@ -23,9 +23,9 @@ from strategies.default import Proportional
 class RaceEnvContinuous(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self, recording_path="", create_extra_boats_num=3):
+    def __init__(self, recording_path="", create_extra_boats_num=0):
         self.action_space = spaces.Box(low=-1, high=1, shape=(1,), dtype=np.float32)
-        self.observation_space = spaces.Box(low=-1, high=1, shape=(9,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=-1, high=1, shape=(5,), dtype=np.float32)
 
         self.seed()
         self.observation = None
@@ -69,10 +69,10 @@ class RaceEnvContinuous(gym.Env):
             'Angle of attack x: ' + str(round(obs[2], 3)),
             'Angle of attack y: ' + str(round(obs[3], 3)),
             'Rudder angle: ' + str(round(obs[4], 3)),
-            'Speed: ' + str(round(obs[5], 3)),
-            'DTW: ' + str(round(obs[6], 3)),
-            'Nearest distance x: ' + str(round(obs[7], 3)),
-            'Nearest distance y: ' + str(round(obs[8], 3)),
+            # 'Speed: ' + str(round(obs[5], 3)),
+            # 'DTW: ' + str(round(obs[6], 3)),
+            # 'Nearest distance x: ' + str(round(obs[7], 3)),
+            # 'Nearest distance y: ' + str(round(obs[8], 3)),
             'Reward: ' + str(round(self._last_reward, 2)),
             'Total reward: ' + str(round(self._total_reward, 2)),
             'Last action: %.2f ' % self._last_action,
@@ -118,9 +118,12 @@ class RaceEnvContinuous(gym.Env):
         if self._last_distance == 0:
             reward = 0
 
+        # negative reward for each timestep, provides incentive to go fast
+        reward -= 0.1
+
         # make a negative reward count heavier to prevent going in circles
-        if reward < 0:
-            reward *= 3
+        # if reward < 0:
+        #     reward *= 3
 
         # limit number of steps
         done = False
@@ -129,11 +132,11 @@ class RaceEnvContinuous(gym.Env):
             print("done due to max steps")
 
         # negative reward for hitting another boat
-        if len(self._nearby_boats) > 0:
-            if self._nearby_boats[0][0] < 0.5:
-                done = True
-                reward = -100
-                print("hit another boat")
+        # if len(self._nearby_boats) > 0:
+        #     if self._nearby_boats[0][0] < 0.5:
+        #         done = True
+        #         reward = -1000
+        #         print("hit another boat")
 
         # check out of bounds
         if self._boat.get_distance_to_waypoint() > 80:
@@ -148,11 +151,11 @@ class RaceEnvContinuous(gym.Env):
             reward = 1000
 
         # give a small award for speed
-        reward += self._boat.speed / 100
+        # reward += self._boat.speed / 100
 
         # penalty if we are going too slow
-        if self._boat.speed < 2:
-            reward -= 1
+        # if self._boat.speed < 2:
+        #     reward -= 1
 
         self._last_reward = reward
         self._total_reward += reward
@@ -177,21 +180,32 @@ class RaceEnvContinuous(gym.Env):
         distance_y = 1
         self._nearby_boats.sort(key=lambda x: x[0])
         if len(self._nearby_boats) > 0:
-            rel_bearing = self._boat.get_heading() - self._boat.get_bearing_to_boat(self._nearby_boats[0][1])
-            vector = to_vector(rel_bearing)
+            rel_bearing_nearby = self._boat.get_heading() - self._boat.get_bearing_to_boat(self._nearby_boats[0][1])
+            vector = to_vector(rel_bearing_nearby)
             distance_x = vector[0] * self._nearby_boats[0][0] / 5
             distance_y = vector[1] * self._nearby_boats[0][0] / 5
 
-        delta = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
+        rel_bearing = self._boat.get_heading() - self._boat.get_bearing_to_waypoint()
         return np.array(
-            list(to_vector(delta)) + list(to_vector(self._boat.get_angle_of_attack())) + [
+             [
+                to_normalized(rel_bearing),
+                to_normalized(self._boat.get_angle_of_attack()),
                 self._boat.rudder_angle / 30,
                 self._boat.speed / 10,
                 self._boat.get_distance_to_waypoint() / 100,
-                distance_x,
-                distance_y
+                # distance_x,
+                # distance_y
             ]
         )
+        # return np.array(
+        #     list(to_vector(rel_bearing)) + list(to_vector(self._boat.get_angle_of_attack())) + [
+        #         self._boat.rudder_angle / 30,
+        #         self._boat.speed / 10,
+        #         self._boat.get_distance_to_waypoint() / 100,
+        #         # distance_x,
+        #         # distance_y
+        #     ]
+        # )
 
     def reset(self):
         # generate new course
@@ -231,3 +245,7 @@ class RaceEnvContinuous(gym.Env):
 def to_vector(deg):
     rad = radians(deg)
     return [cos(rad), sin(rad)]
+
+
+def to_normalized(deg):
+    return ((deg + 180) % 360 - 180) / 180
