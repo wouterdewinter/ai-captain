@@ -48,7 +48,7 @@ class RaceSimulator:
     def run(self):
 
         # start thread for steering strategy
-        thread = RaceUpdateThread(self._strategies, tf.get_default_graph())
+        thread = RaceUpdateThread(self._strategies, tf.compat.v1.get_default_graph())
         thread.daemon = True
         thread.start()
 

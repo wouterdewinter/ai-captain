@@ -176,7 +176,7 @@ class Boat:
 
         # save history
         if self._keep_log:
-            self.history = self.history.append([{
+            self.history = self.history._append([{
                 'datetime': dt.now(),
                 'boat_angle': self.boat_angle + np.random.normal(0, 1),
                 'boat_heel': self.boat_heel if np.random.uniform(0, 1) < 0.99 else np.nan,

@@ -65,7 +65,7 @@ class Simulator:
         self._boat.shuffle()
 
         # start thread for steering strategy
-        thread = UpdateThread(self._boat, self._env, self._strategy, tf.get_default_graph())
+        thread = UpdateThread(self._boat, self._env, self._strategy, tf.compat.v1.get_default_graph())
         thread.daemon = True
         thread.start()
 
