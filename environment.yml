@@ -11,5 +11,7 @@ dependencies:
   - gym
   - stable-baselines3
   - opencv
+  - notebook
+  - nb_conda_kernels
   - pip:
     - PyGeodesy==18.10.29
